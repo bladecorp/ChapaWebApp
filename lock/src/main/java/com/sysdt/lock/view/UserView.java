@@ -68,7 +68,7 @@ public class UserView implements Serializable{
 		try {
 			aperturaService.enviarSolicitudDeApertura(unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon());
 			MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
-				+ "pero esta sujeta a la cobertura de la compañia de telefonia celular", FacesMessage.SEVERITY_INFO);
+				+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
 		} catch (Exception e) {
 			MensajeGrowl.mostrar("No fue posible enviar la solicitud de apertura remota", FacesMessage.SEVERITY_FATAL);
 		}
