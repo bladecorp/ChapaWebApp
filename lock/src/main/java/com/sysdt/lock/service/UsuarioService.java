@@ -34,9 +34,9 @@ public class UsuarioService {
 	public UsuarioDTO obtenerYvalidarUsuario(String username, String password, String nombreCliente) throws Exception{
 		Usuario usuario = obtenerUsuarioPorUsername(username);
 		if(usuario == null){
-			throw new Exception("Usuario inválido");
+			throw new Exception("Usuario invalido");
 		}else if(!usuario.getEnabled()){
-			throw new Exception("Su cuenta está deshabilitada. Por favor consulte a su proveedor");
+			throw new Exception("Su cuenta esta deshabilitada. Por favor consulte a su proveedor");
 		}else if(!usuario.getPassword().contentEquals(password)){
 			throw new Exception("Password incorrecto");
 		}

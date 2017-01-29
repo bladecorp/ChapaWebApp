@@ -62,13 +62,13 @@ public class UserView implements Serializable{
 		}
 		unit = unidadService.obtenerUnidadPorEcoYidCliente(unit.getEco(), unit.getIdcliente());
 		if(unit.getToken() == null || unit.getToken().trim().isEmpty()){
-			MensajeGrowl.mostrar("La unidad no está habilitada para apertura remota", FacesMessage.SEVERITY_ERROR);
+			MensajeGrowl.mostrar("La unidad no esta habilitada para apertura remota", FacesMessage.SEVERITY_ERROR);
 			return;
 		}
 		try {
 			aperturaService.enviarSolicitudDeApertura(unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon());
 			MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
-				+ "pero está sujeta a la cobertura de la compañía de telefonía celular", FacesMessage.SEVERITY_INFO);
+				+ "pero esta sujeta a la cobertura de la compañia de telefonia celular", FacesMessage.SEVERITY_INFO);
 		} catch (Exception e) {
 			MensajeGrowl.mostrar("No fue posible enviar la solicitud de apertura remota", FacesMessage.SEVERITY_FATAL);
 		}
@@ -86,7 +86,7 @@ public class UserView implements Serializable{
 				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente());
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Ocurrió un error al generar el código: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("Ocurrio un error al generar el codigo: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}

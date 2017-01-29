@@ -112,7 +112,7 @@ public class SuperView implements Serializable{
 				MensajeGrowl.mostrar("No se encontraron registros en esa fecha", FacesMessage.SEVERITY_WARN);
 			}
 		}catch(Exception ex){
-			MensajeGrowl.mostrar("Ocurrió una excepción al recuperar el historial", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrio una excepcion al recuperar el historial", FacesMessage.SEVERITY_FATAL);
 		}
 		establecerMapaInicial();
 	}
@@ -224,7 +224,7 @@ public class SuperView implements Serializable{
 			modeloMapa.addOverlay(new Marker(coordenada, "Unidad: "+historicoSel.getPlacasEco()));
 		}catch(Exception e){
 			establecerMapaInicial();
-			MensajeGrowl.mostrar("Ocurrió un error al obtener las coordenadas", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrio un error al obtener las coordenadas", FacesMessage.SEVERITY_FATAL);
 		}
 		RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
 	}
