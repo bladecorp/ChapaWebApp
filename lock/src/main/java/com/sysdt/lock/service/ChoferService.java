@@ -46,6 +46,7 @@ public class ChoferService {
 	
 	public void insertarChofer(Chofer chofer)throws Exception{
 		convertirMayusculas(chofer);
+		chofer.setEnabled(true);
 		chofer.setToken("");
 		choferMapper.insert(chofer);
 	}
