@@ -38,26 +38,27 @@ public class AperturaService{
 	private HistoricoService historicoService;
 	
 	@Autowired
-	private UnidadService unidadService;
+	private ChoferService choferService;
 	
-	public void enviarSolicitudDeApertura(Unidad unidad, String usuario, boolean isWialon)throws Exception{
-		int resp = EnviarHttpPush(unidad.getToken(), unidad.getId());
+	public void enviarSolicitudDeApertura(int idChofer, String token, Unidad unidad, String usuario, boolean isWialon)throws Exception{
+		int resp = EnviarHttpPush(token, idChofer, unidad.getSerie());
 		if(resp != HttpStatus.SC_OK){
 			throw new Exception("Error al enviar mensaje. HTTP CODE: "+resp);
 		}
-		agregarAperturaAlistaDeEspera(unidad.getId(), unidad.getEco(), usuario, isWialon);
+		agregarAperturaAlistaDeEspera(idChofer, unidad.getEco(), unidad.getSerie(), usuario, isWialon);
 	}
 	
-	private void agregarAperturaAlistaDeEspera(int idUnidad, String eco, String usuario, boolean isWialon)throws Exception{
+	private void agregarAperturaAlistaDeEspera(int idChofer, String eco, String serie, String usuario, boolean isWialon)throws Exception{
 		AperturaDTO apertura = new AperturaDTO();
 		apertura.setUsuario(usuario);
 		apertura.setEco(eco);
+		apertura.setSerie(serie);
 		apertura.setWialon(isWialon);
 		apertura.setTiempo(System.currentTimeMillis());
-		aperturas.put(idUnidad, apertura);
+		aperturas.put(idChofer, apertura);
 	}
 	
-	private int EnviarHttpPush(String token, int idUnidad)throws Exception{
+	private int EnviarHttpPush(String token, int idChofer, String serie)throws Exception{
 		String url = "https://api.pushbots.com/push/one";
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(url);
@@ -66,7 +67,7 @@ public class AperturaService{
 		StringEntity entity = new StringEntity("{\"platform\":\"1\","
 												+ "\"token\":\""+token+"\","
 												+ "\"msg\":\""+PUSHBOTS.getMensaje()+"\","
-												+ "\"payload\":{\"idUnidad\":\""+idUnidad+"\"},"
+												+ "\"payload\":{\"idChofer\":\""+idChofer+"\", \"serie\":\""+serie+"\"},"
 												+ "\"sound\":\"\"}");   
 		entity.setContentType("application/json");
 		post.setEntity(entity);
@@ -74,12 +75,12 @@ public class AperturaService{
 		return response.getStatusLine().getStatusCode(); 
 	}
 	
-	public RespuestaDTO registrarToken(int idUnidad, String token) {
+	public RespuestaDTO registrarToken(int idChofer, String token) {
 		RespuestaDTO respuesta = new RespuestaDTO();
 		respuesta.setAutorizacion(false);
 		try{
-			if(idUnidad == 0){
-				respuesta.setMensaje("El id de la unidad llego vacio");
+			if(idChofer == 0){
+				respuesta.setMensaje("El id del chofer llego vacio");
 				return respuesta;
 			}
 			if(token == null || token.trim().isEmpty()){
@@ -87,12 +88,12 @@ public class AperturaService{
 				return respuesta;
 			}
 			
-			boolean exito = unidadService.actualizarToken(idUnidad, token);
+			boolean exito = choferService.actualizarToken(idChofer, token);
 			if(exito){
 				respuesta.setAutorizacion(true);
 				respuesta.setMensaje("Token actualizado correctamente");
 			}else{
-				respuesta.setMensaje("No se encontro el registro de la unidad");
+				respuesta.setMensaje("No se encontro el registro del chofer");
 			}
 		}catch(Exception e){
 			respuesta.setMensaje("Ocurrio una excepcion: "+e.getMessage());
@@ -104,24 +105,24 @@ public class AperturaService{
 		RespuestaDTO respuesta = new RespuestaDTO();
 		respuesta.setAutorizacion(false);
 		try{
-			AperturaDTO aperturaDTO = aperturas.get(solicitud.getIdUnidad());
+			AperturaDTO aperturaDTO = aperturas.get(solicitud.getIdChofer());
 			if(aperturaDTO == null){
-				respuesta.setMensaje("La unidad no tiene aperturas pendientes");
+				respuesta.setMensaje("El chofer no tiene aperturas pendientes");
 				return respuesta;
 			}
-			
+			aperturas.remove(solicitud.getIdChofer());
 			if(!validarSolicitudApertura(solicitud, respuesta)){
 				return respuesta;
 			}
 			
 			long tiempoActual = System.currentTimeMillis();
 			if( ((tiempoActual - aperturaDTO.getTiempo())/1000) >  Constantes.TIEMPO_MAXIMO_ESPERA_EN_SEGUNDOS){
-				aperturas.remove(solicitud.getIdUnidad());
+		//		aperturas.remove(solicitud.getIdUnidad());
 				respuesta.setMensaje("Tiempo de espera agotado");
 				return respuesta;
 			} 
 		
-			aperturas.remove(solicitud.getIdUnidad());
+		//	aperturas.remove(solicitud.getIdUnidad());
 			if(!aperturaDTO.isWialon()){
 				Historico historico = new Historico();
 				historico.setUsername(aperturaDTO.getUsuario());
@@ -143,8 +144,8 @@ public class AperturaService{
 	
 	private boolean validarSolicitudApertura(SolicitudDTO solicitud, RespuestaDTO respuesta){
 		
-		if(solicitud.getIdUnidad() == 0){
-			respuesta.setMensaje("La unidad es invalida. Valor: 0");
+		if(solicitud.getIdChofer() == 0){
+			respuesta.setMensaje("El chofer es invalido. Valor: 0");
 			return false;
 		}
 		

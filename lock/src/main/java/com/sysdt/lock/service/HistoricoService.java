@@ -3,12 +3,14 @@ package com.sysdt.lock.service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sysdt.lock.dao.HistoricoMapper;
+import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.HistoricoExample;
 import com.sysdt.lock.model.HistoricoExample.Criteria;
@@ -24,7 +26,10 @@ public class HistoricoService {
 	@Autowired
 	private HistoricoMapper historicoMapper;
 	
-	public List<Historico> obtenerHistoricoPorUsuarioFechaYTipo(String username, Date fechaIni, Date fechaFin, int tipo) throws Exception{
+	@Autowired
+	private ChoferService choferService;
+	
+	public List<Historico> obtenerHistoricoPorUsuarioFechaYTipo(int idCliente, String username, Date fechaIni, Date fechaFin, int tipo) throws Exception{
 		HistoricoExample exHist = new HistoricoExample();
 		Criteria criteria = exHist.createCriteria();
 		criteria.andUsernameEqualTo(username);
@@ -34,7 +39,7 @@ public class HistoricoService {
 		}else if(tipo == Constantes.TipoEvento.APERTURA_CHAPA){
 			criteria.andLatitudIsNotNull().andLongitudIsNotNull();
 		}
-		return historicoMapper.selectByExample(exHist);
+		return historicoConChofer(idCliente, historicoMapper.selectByExample(exHist));
 	}
 	
 	public void insertarHistorico(String username, String placasEco, boolean estado) throws Exception{
@@ -48,6 +53,19 @@ public class HistoricoService {
 	
 	public void insertarHistoricoConCoordenadas(Historico historico)throws Exception{
 		historicoMapper.insert(historico);
+	}
+	
+	private List<Historico> historicoConChofer(int idCliente, List<Historico> historicos){
+		Map<Integer, Chofer> choferes = choferService.obtenerChoferesPorIdClienteComoMapa(idCliente, false, false);
+		for (Historico historico : historicos) {
+			Chofer chofer = choferes.get(historico.getIdchofer());
+			if(chofer != null){
+				historico.setChofer(chofer.getNombre()+" "+chofer.getApaterno());
+			}else{
+				historico.setChofer("N/D");
+			}
+		}
+		return historicos;
 	}
 	
 	private Date generarFecha(Date fecha, int tipoFecha){

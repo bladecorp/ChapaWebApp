@@ -20,6 +20,7 @@ import com.sysdt.lock.dto.UserDTO;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.service.ClienteService;
 import com.sysdt.lock.service.UsuarioService;
+import com.sysdt.lock.util.Constantes;
 import com.sysdt.lock.util.MensajeGrowl;
 
 @ManagedBean
@@ -91,12 +92,14 @@ public class ManejoSesionView implements Serializable{
 	public void redirigir(int idRedirect){
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		try {
-			if(idRedirect == 1){
+			if(idRedirect == Constantes.Vistas.VISTA_CODIGOS){
 				context.redirect("codigos.xhtml");	
-			}else if(idRedirect == 2){
+			}else if(idRedirect == Constantes.Vistas.VISTA_SUPERVISION){
 				context.redirect("supervision.xhtml");
-			}else if(idRedirect == 3){
+			}else if(idRedirect == Constantes.Vistas.VISTA_ADMINISTRACION){
 				context.redirect("admin.xhtml");
+			}else if(idRedirect == Constantes.Vistas.VISTA_CHOFERES){
+				context.redirect("chofer.xhtml");
 			}else{
 				context.redirect("login.xhtml");
 			}

@@ -73,35 +73,37 @@
 								<p:fragment>
 									<div class="row">
 									<p:panelGrid id="pnlHistorico" styleClass="noBorder">
-										<div class="form form-inline">
-										<div class="form-group col-md-3 col-sm-12 col-xs-12">
-											<label for="tipoBusqueda" style="margin-left: 5px;margin-right: 5px;"> Tipo </label>
+										<div class="form">
+										<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-12">
 											<h:selectOneMenu id="tipoBusqueda" value="#{superView.tipoBisqueda}" styleClass="form-control">
 												<f:selectItem itemLabel="TODO" itemValue="0"/>
 												<f:selectItem itemLabel="CODIGOS" itemValue="1"/>
 												<f:selectItem itemLabel="APERTURAS" itemValue="2" />
 											</h:selectOneMenu>
 										</div>
-										<div class="form-group  col-md-3 col-sm-12 col-xs-12">
-											<label for="calIni" style="margin-left: 5px;margin-right: 5px;"> Inicio </label>
-											<p:calendar id="calIni" value="#{superView.fechaIni}" size="4" pattern="dd/MM/yy"
-												placeholder="Inicio" locale="es" readonlyInput="true">
+										<div class="form-group col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top:10px;padding:0;">
+											<label for="calIni" style="float:right;">De</label>
+										</div>
+										<div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-5">
+											<p:calendar id="calIni" value="#{superView.fechaIni}" pattern="dd/MM/yy"
+												placeholder="Inicio" locale="es" readonlyInput="true" styleClass="form-control" style="padding:0;">
 												<p:ajax event="dateSelect" update="form:calFin" listener="#{superView.seleccionarFechaInicial}"/>
 											</p:calendar>
-<!-- 											<input type="text" placeholder="INICIO" class="form-control" /> -->
 										</div>
-										<div class="form-group  col-md-2 col-sm-12 col-xs-12">
-											<label for="calFin" style="margin-left: 5px;margin-right: 5px;"> Fin </label>
-											<p:calendar id="calFin" value="#{superView.fechaFin}" size="4" readonlyInput="true" pattern="dd/MM/yy"
-												placeholder="Fin" locale="es" mindate="#{superView.fechaIni}"/>
+										<div class="form-group col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top:10px;padding:0;">
+											<label for="calIni" style="float:right;">A</label>
+										</div>
+										<div class="form-group col-lg-2  col-md-2 col-sm-4 col-xs-5">
+											<p:calendar id="calFin" value="#{superView.fechaFin}" readonlyInput="true" pattern="dd/MM/yy" style="padding:0;"
+												placeholder="Fin" locale="es" mindate="#{superView.fechaIni}" styleClass="form-control"/>
 <!-- 											<input type="text" placeholder="FIN" class="form-control" /> -->
 										</div>
-										<div class="form-group col-md-3 col-sm-12 col-xs-12">
+										<div class="form-group col-lg-3 col-md-3 col-sm-5 col-xs-9">
 											<p:commandButton value="Buscar" styleClass="btn btn-success form-control" style="width:100%;"
 												action="#{superView.buscarHistorico}" update="form:dtHistorico, form:pnlMapa" 
 												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 										</div>
-										<div class="form-group col-md-1 col-sm-12 col-xs-12">
+										<div class="form-group col-lg-1 col-md-1 col-sm-3 col-xs-3">
 											<p:commandLink id="linkReporte" styleClass="btn btn-warning form-control" ajax="false"
 												disabled="#{superView.usuario == null || superView.usuario.username == null}" >
 												<i class="fa fa-bar-chart"></i>
@@ -138,16 +140,14 @@
 												<p:column headerText="UNIDAD"> 
 													<p:outputLabel value="#{hist.placasEco}" />
 												</p:column>
-												<p:column headerText="MAPA" exportable="false" rendered="#{superView.tipoBisqueda != 1}"> 
-													<p:commandLink id="ajax" rendered="#{hist.latitud != null}" style="cursor:default;">
-												        <i class="fa fa-map-marker" style="color:magenta"></i>
-												    </p:commandLink>
+												<p:column headerText="CHOFER"> 
+													<p:outputLabel value="#{hist.chofer}" style="font-size:13px;" />
 												</p:column>
 												<p:column headerText="ESTADO" > 
 													<p:outputLabel value="#{hist.estado?'Correcto':'Fallido'}" style="color:#{hist.estado?'green':'red'}" />
 												</p:column>
 												<p:column headerText="TIPO" rendered="#{superView.tipoBisqueda == 0}"> 
-													<p:outputLabel value="#{hist.latitud != null?'Apertura':'Codigo'}"  />
+													<p:outputLabel value="#{hist.idtipoevento == 1?'Codigo':'Apertura'}"  />
 												</p:column>
 											</p:dataTable>
 										</div>

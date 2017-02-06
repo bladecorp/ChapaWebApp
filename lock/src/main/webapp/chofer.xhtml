@@ -1,0 +1,181 @@
+<ui:composition template="template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="content">
+
+	<h:form id="form">
+		<p:growl id="growl" autoUpdate="true" showDetail="false" />
+
+		<div class="row">
+		
+			<!--  FILA 1 COLUMNA 1 -->
+
+			<div class="col-lg-4">
+				<div class="row">
+				<div class="col-lg-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">CHOFER</h3>
+						</div>
+						<div class="panel-body">
+						<p:fragment>
+							<p:panelGrid id="pnlChofer">
+								<div class="form-horizontal">
+									<div class="form-group">
+										<h:outputLabel value="Nombre" style="font-size:13px;"
+											styleClass="control-label col-sm-3" />
+										<div class="col-sm-9">
+											<div class="input-group">
+												<p:inputText id="inputNombre" styleClass="form-control"
+													style="text-align:center;"
+													value="#{choferView.chofer.nombre}" />
+												<span class="input-group-addon"><i class="fa fa-user"></i>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<h:outputLabel value="A. Paterno" style="font-size:13px;"
+											styleClass="control-label col-sm-3" />
+										<div class="col-sm-9">
+											<div class="input-group">
+												<p:inputText id="inputApaterno" styleClass="form-control"
+													style="text-align:center;"
+													value="#{choferView.chofer.apaterno}" />
+												<span class="input-group-addon"><i class="fa fa-user"></i>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<h:outputLabel value="A. Materno" style="font-size:13px;"
+											styleClass="control-label col-sm-3" />
+										<div class="col-sm-9">
+											<div class="input-group">
+												<p:inputText id="inputAmaterno" styleClass="form-control"
+													style="text-align:center;"
+													value="#{choferView.chofer.amaterno}" />
+												<span class="input-group-addon"><i class="fa fa-user"></i>
+												</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+											<h:outputLabel value="Estado" style="font-size:13px;"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group" style="width:100%;">
+													<h:selectOneMenu id="slctEstado" styleClass="form-control" value="#{choferView.chofer.enabled}">
+														<f:selectItem itemLabel="ACTIVO" itemValue="true"/>
+														<f:selectItem itemLabel="INACTIVO" itemValue="false" />
+													</h:selectOneMenu>
+													<span class="input-group-addon"><i class="fa fa-eye"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+									
+									<div class="form-group" style="margin-top: 35px;">
+										<div class="col-md-2 col-sm-2 col-xs-2">
+											<p:commandButton update="inputNombre, inputApaterno, inputAmaterno" action="#{choferView.limpiarCampos}"
+												styleClass="btn btn-warning form-control" icon="fa fa-eraser" />
+										</div>
+										<div class="col-md-5 col-sm-5 col-xs-5">
+											<p:commandButton value="ACTUALIZAR"
+												update="inputNombre, inputApaterno, inputAmaterno, dtChoferes"
+												styleClass="btn btn-primary form-control"
+												action="#{choferView.actualizarChofer}" 
+												onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+										</div>
+										<div class="col-md-5 col-sm-5 col-xs-5">
+											<p:commandButton value="NUEVO"
+												update="inputNombre, inputApaterno, inputAmaterno, dtChoferes"
+												styleClass="btn btn-success form-control"
+												action="#{choferView.guardarNuevoChofer}" 
+												onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+										</div>
+									</div>
+
+								</div>
+							</p:panelGrid>
+						</p:fragment>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- FILA 1 COLUMNA 2 -->
+				<div class="col-lg-8">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<h3 class="panel-title">LISTA DE CHOFERES</h3>
+								</div>
+								<div class="panel-body">
+								<p:fragment>
+									<p:panel styleClass="noBorder">
+										<div class="form-horizontal">
+											<div class="form-group">
+												<h:outputLabel value="Ver choferes por estado"
+													styleClass="control-label col-sm-4" />
+												<div class="col-sm-8">
+													<h:selectOneMenu id="inputEstadoSel" styleClass="form-control"
+														value="#{choferView.estado}">
+														<p:ajax event="change" update="dtChoferes, form:inputNombre, form:inputApaterno, form:inputAmaterno"
+															listener="#{choferView.recargarTabla}"  
+															onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+														<f:selectItem itemLabel="ACTIVOS" itemValue="1"/>
+														<f:selectItem itemLabel="INACTIVOS" itemValue="2" />
+														<f:selectItem itemLabel="TODOS" itemValue="0" />
+													</h:selectOneMenu>
+												</div>
+											</div>
+										</div>
+										<p:dataTable id="dtChoferes" paginator="true" rows="10"
+											paginatorTemplate="{PageLinks} {RowsPerPageDropdown}"
+                         					rowsPerPageTemplate="10,15,20" dataLocale="es_ES"
+											paginatorPosition="bottom" value="#{choferView.choferes}"
+											var="chofer" reflow="true" selectionMode="single" 
+											selection="#{choferView.choferSel}" rowKey="#{chofer.id}">
+											<p:ajax event="rowSelect" listener="#{choferView.copiarChofer}"
+												update="form:inputNombre, form:inputApaterno, form:inputAmaterno, 
+													form:slctEstado" 
+												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+											<p:column headerText="ID" style="text-align:center;" sortBy="#{chofer.id}">
+												<h:outputText value="#{chofer.id}" />
+											</p:column>
+											<p:column headerText="Nombre" style="text-align:center;" sortBy="#{chofer.nombre}">
+												<h:outputText value="#{chofer.nombre}" />
+											</p:column>
+											<p:column headerText="A. Paterno" style="text-align:center;" sortBy="#{chofer.apaterno}">
+												<h:outputText value="#{chofer.apaterno}" />
+											</p:column>
+											<p:column headerText="A. Materno" style="text-align:center;" sortBy="#{chofer.amaterno}">
+												<h:outputText value="#{chofer.amaterno}" />
+											</p:column>
+											<p:column headerText="Estado" style="text-align:center;">
+												<h:outputText value="#{chofer.enabled?'Activo':'Inactivo'}"
+													style="color:#{chofer.enabled?'green':'red'}" />
+											</p:column>
+
+										</p:dataTable>
+									</p:panel>
+								</p:fragment>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			
+		</div>
+		
+	</h:form>
+		
+	</ui:define>
+</ui:composition>

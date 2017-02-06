@@ -179,7 +179,7 @@
 												<div class="input-group" style="width:100%;">
 													<h:selectOneMenu id="slctClienteUnidad" styleClass="form-control" value="#{adminView.idCliente}" >
 														<f:selectItems value="#{adminView.clientes}" var="c" itemLabel="#{c.nombre}" itemValue="#{c.id}" />
-														<p:ajax event="change" listener="#{adminView.cargarUnidadesDelCliente()}" update="slctUnidades inputUnidad"  />
+														<p:ajax event="change" listener="#{adminView.cargarUnidadesDelCliente}" update="slctUnidades inputUnidad inputSerie"  />
 													</h:selectOneMenu>
 													<span class="input-group-addon"><i class="fa fa-building"></i>
 													</span>
@@ -192,7 +192,7 @@
 											<div class="col-sm-9">
 												<div class="input-group" style="width:100%;">
 													<h:selectOneMenu id="slctUnidades" styleClass="form-control" value="#{adminView.unidadSel}">
-														<p:ajax event="change" update="inputUnidad"/>
+														<p:ajax event="change" update="inputUnidad inputSerie" listener="#{adminView.cambioUnidad}"/>
 														<f:selectItems value="#{adminView.unidades}" var="unit" itemLabel="#{unit.eco}" itemValue="#{unit.id}" />
 													</h:selectOneMenu>
 													<span class="input-group-addon"><i class="fa fa-truck"></i>
@@ -201,7 +201,7 @@
 											</div>
 										</div>
 										<div class="form-group">
-											<h:outputLabel value="ECO"
+											<h:outputLabel value="Eco"
 												styleClass="control-label col-sm-3" />
 											<div class="col-sm-9">
 												<div class="input-group" style="width:100%;">
@@ -213,22 +213,35 @@
 												</div>
 											</div>
 										</div>
+										<div class="form-group">
+											<h:outputLabel value="Serie"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group" style="width:100%;">
+													<p:inputText id="inputSerie"
+														styleClass="form-control" style="text-align:center;"
+														value="#{adminView.serie}" />
+													<span class="input-group-addon"><i class="fa fa-truck"></i>
+													</span>
+												</div>
+											</div>
+										</div>
 										<div class="form-group" style="margin-top: 35px;">
 											<div class="col-md-2 col-sm-2 col-xs-2">
-												<p:commandButton update="inputUnidad, slctUnidades" action="#{adminView.eliminarUnidad}"
+												<p:commandButton update="inputUnidad, slctUnidades, inputSerie" action="#{adminView.eliminarUnidad}"
 													styleClass="btn btn-danger form-control" icon="fa fa-trash" 
 													onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 											</div>
 											<div class="col-md-5 col-sm-5 col-xs-5">
 												<p:commandButton value="ACTUALIZAR"
-													update="inputUnidad, slctUnidades"
+													update="inputUnidad, slctUnidades, inputSerie"
 													styleClass="btn btn-primary form-control"
 													action="#{adminView.actualizarUnidad}" 
 													onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 											</div>
 											<div class="col-md-5 col-sm-5 col-xs-5">
 												<p:commandButton value="NUEVO"
-													update="inputUnidad, slctUnidades"
+													update="inputUnidad, slctUnidades, inputSerie"
 													styleClass="btn btn-success form-control"
 													action="#{adminView.guardarUnidad}" 
 													onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
@@ -297,7 +310,7 @@
 
 										</p:dataTable>
 									</p:panel>
-									<div class="col-lg-6 col-sm-12"> <!-- col-lg-offset-1 -->
+									<div class="col-lg-6 col-sm-6 col-xs-6"> <!-- col-lg-offset-1 -->
 										<div class="form-group" style="text-align:center;">
 											<p:commandButton value="DESHABILITAR" 
 														styleClass="btn btn-danger form-control" 
@@ -305,7 +318,7 @@
 														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 										</div>
 									</div>
-									<div class="col-lg-6 col-sm-12">
+									<div class="col-lg-6 col-sm-6 col-xs-6">
 										<div class="form-group" style="text-align:center;">
 											<p:commandButton value="HABILITAR" 
 														styleClass="btn btn-success form-control" 
@@ -359,26 +372,22 @@
 													<f:selectItem itemLabel="Inactivo" itemValue="false"/>
 												</h:selectOneMenu>
 											</div>
-										</div>
-										<div class="form form-inline">
-											<div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
-												<div class="form-group">
-													<p:commandLink action="#{adminView.eliminarUsuario}" styleClass="btn btn-sm btn-danger"
-														update="dtUsuarios, form:editUsername, form:editPass" 
+											<div class="form-group">
+												<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+													<p:commandButton action="#{adminView.eliminarUsuario}" styleClass="btn btn-danger form-control"
+														update="dtUsuarios, form:editUsername, form:editPass" icon="fa fa-trash"
 														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()">
-														<i class="fa fa-trash"></i>
-													</p:commandLink>
+													</p:commandButton>
 												</div>
-											</div>
-											<div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-											<div class="form-group" style="text-align:center;">
-												<p:commandButton value="ACTUALIZAR" action="#{adminView.actualizarUsuario}"
+												<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+													<p:commandButton value="ACTUALIZAR" action="#{adminView.actualizarUsuario}"
 													styleClass="btn btn-success btn-block form-control" 
 													update="dtUsuarios" onclick="PF('statusDialog').show()"  
 													oncomplete="PF('statusDialog').hide()"/>
-											</div>
+												</div>
 											</div>
 										</div>
+					
 									</p:panelGrid>
 									</p:fragment>
 								</div>
@@ -446,23 +455,23 @@
 											</p:column>
 										</p:dataTable>
 									</p:panelGrid>
-									<div class="col-lg-4 col-sm-12"> <!-- col-lg-offset-1 -->
-										<div class="form-group text-left" >
-											<p:commandLink id="btnDelAs" action="#{adminView.eliminarAsociado}" styleClass="btn btn-sm btn-danger" 
-														update="form:dtAsociados" disabled="#{adminView.disableAsociado}"
+									<div class="form">
+										<div class="form-group">
+											<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+												<p:commandButton id="btnDelAs" action="#{adminView.eliminarAsociado}" styleClass="btn btn-danger form-control" 
+														update="form:dtAsociados" disabled="#{adminView.disableAsociado}" icon="fa fa-trash"
 														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()">
-														<i class="fa fa-trash"></i>
-											</p:commandLink>
-										</div>
-									</div>
-									<div class="col-lg-8 col-sm-12">
-										<div class="form-group text-left">
-											<p:commandButton id="btnActAs" value="ACTUALIZAR" disabled="#{adminView.disableAsociado}"
+												</p:commandButton>
+											</div>
+											<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+												<p:commandButton id="btnActAs" value="ACTUALIZAR" disabled="#{adminView.disableAsociado}"
 														styleClass="btn btn-success form-control" 
 														action="#{adminView.guardarListaAsociados}" 
 														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+											</div>
 										</div>
 									</div>
+									
 									</p:fragment>
 								</div>
 							</div>

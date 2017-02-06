@@ -176,3 +176,8 @@ background: linear-gradient(to left, #c0c1c1, #f1f1f1); /* W3C, IE 10+/ Edge, Fi
     box-shadow: none !important;
     border: none !important;
 }
+
+.hasDatepicker{
+	width:100% !important;
+	height:100% !important;
+}

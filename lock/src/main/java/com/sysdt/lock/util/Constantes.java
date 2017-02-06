@@ -32,6 +32,18 @@ public class Constantes {
 		public static final String LONGITUD_INICIAL = "-99.133386";
 	}
 	
+	public class EstadoChofer{
+		public static final int TODOS = 0;
+		public static final boolean ACTIVO = true;
+		public static final boolean INACTIVO = true;
+	}
 	
+	public class Vistas{
+		public static final int VISTA_CODIGOS = 1;
+		public static final int VISTA_SUPERVISION = 2;
+		public static final int VISTA_ADMINISTRACION = 3;
+		public static final int VISTA_CHOFERES = 4;
+		
+	}
 
 }

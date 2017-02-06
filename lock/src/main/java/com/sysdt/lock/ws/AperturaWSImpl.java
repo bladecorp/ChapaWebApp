@@ -19,8 +19,8 @@ public class AperturaWSImpl implements AperturaWS{
 	}
 
 	@Override
-	public RespuestaDTO registrarToken(int idUnidad, String token) {
-		return aperturaService.registrarToken(idUnidad, token);
+	public RespuestaDTO registrarToken(int idChofer, String token) {
+		return aperturaService.registrarToken(idChofer, token);
 	}
 
 }

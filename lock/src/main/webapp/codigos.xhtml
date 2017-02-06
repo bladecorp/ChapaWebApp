@@ -60,6 +60,19 @@
 										</div>
 									</div>
 								</div>
+								<div class="form-group">
+									<h:outputLabel value="Chofer"
+										styleClass="control-label col-sm-3" />
+									<div class="col-sm-7">
+										<div class="input-group" style="width:100%;">
+											<h:selectOneMenu value="#{userView.idChofer}" styleClass="form-control" style="width:100%;">
+												<f:selectItems value="#{userView.choferes}" var="ch" itemValue="#{ch.id}" 
+														itemLabel="#{ch.nombre} #{ch.apaterno} #{ch.amaterno}" />
+											</h:selectOneMenu>
+											<span class="input-group-addon"><i class="fa fa-user"></i></span> 
+										</div>
+									</div>
+								</div>
 								<div class="form-group" style="margin-top: 35px;">
 <!-- 									<p:outputLabel styleClass="control-label col-sm-2" /> -->
 									<div class="col-md-6 col-sm-6 col-xs-6">

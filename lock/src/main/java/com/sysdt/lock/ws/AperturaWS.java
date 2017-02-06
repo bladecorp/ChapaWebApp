@@ -14,5 +14,5 @@ public interface AperturaWS {
 	RespuestaDTO consultarApertura(@WebParam(name="solicitud")SolicitudDTO solicitud);
 	
 	@WebResult(name="respuesta")
-	RespuestaDTO registrarToken(@WebParam(name="idUnidad")int idUnidad, @WebParam(name="token") String token);
+	RespuestaDTO registrarToken(@WebParam(name="idChofer")int idChofer, @WebParam(name="token") String token);
 }

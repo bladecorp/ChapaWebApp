@@ -7,6 +7,7 @@ public class AperturaDTO implements Serializable{
 	private static final long serialVersionUID = 5474728287541454227L;
 	private String usuario;
 	private String eco;
+	private String serie;
 	private long tiempo;
 	private boolean isWialon;
 	
@@ -33,6 +34,12 @@ public class AperturaDTO implements Serializable{
 	}
 	public void setWialon(boolean isWialon) {
 		this.isWialon = isWialon;
+	}
+	public String getSerie() {
+		return serie;
+	}
+	public void setSerie(String serie) {
+		this.serie = serie;
 	}
 	
 	

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -30,6 +31,7 @@ import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.sysdt.lock.dto.UsuarioDTO;
+import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.HistoricoService;
@@ -77,8 +79,9 @@ public class SuperView implements Serializable{
 		}else{
 			titulo = "";
 			historicos = new ArrayList<Historico>();
-			fechaIni = new Date();
-			fechaFin = new Date();
+			Calendar cal = Calendar.getInstance();
+			fechaIni = cal.getTime();
+			fechaFin = cal.getTime();
 			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.ADMINISTRADOR || 
 					usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.MASTER){
 				usuarios = usuarioService.obtenerUsuariosPorIdClienteSinPass(usuarioDTO.getIdCliente());
@@ -102,7 +105,7 @@ public class SuperView implements Serializable{
 		}
 	
 		try{
-			historicos = historicoService.obtenerHistoricoPorUsuarioFechaYTipo(usuario.getUsername(), fechaIni, fechaFin, tipoBisqueda);
+			historicos = historicoService.obtenerHistoricoPorUsuarioFechaYTipo(usuario.getIdCliente(),usuario.getUsername(), fechaIni, fechaFin, tipoBisqueda);
 			registros = historicos.size();
 			calcularRegistros();
 			String tituloContenido = nombreArchivo();
@@ -120,8 +123,6 @@ public class SuperView implements Serializable{
 	public void cambioUsuario(){
 		historicos.clear();
 	}
-	
-	
 	
 	public void procesarPDF(Object documento){
 		try{
@@ -164,8 +165,8 @@ public class SuperView implements Serializable{
 	}
 	
 	public String unidadSeleccionada(){
-		String msj = "Unidad: "+historicoSel.getPlacasEco();
-		msj += " Fecha: "+convertirFecha(historicoSel.getFecha());
+		String msj = historicoSel.getPlacasEco();
+		msj += " -> "+convertirFecha(historicoSel.getFecha());
 		msj += " "+convertirHora(historicoSel.getFecha());
 		return msj;
 	}
@@ -371,5 +372,6 @@ public class SuperView implements Serializable{
 	public void setHistoricoSel(Historico historicoSel) {
 		this.historicoSel = historicoSel;
 	}
+
 
 }

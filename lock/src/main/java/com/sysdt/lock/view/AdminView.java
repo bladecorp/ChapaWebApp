@@ -56,6 +56,7 @@ public class AdminView implements Serializable {
 	private List<Unidad> unidades;
 	private int unidadSel;
 	private String eco;
+	private String serie;
 	private Usuario usuario;
 	private Usuario usuarioSel;
 	private int clienteSel;
@@ -279,15 +280,12 @@ public class AdminView implements Serializable {
 		Unidad unidad = new Unidad();
 		unidad.setId(0);
 		unidad.setEco(eco);
+		unidad.setSerie(serie != null ? serie.trim() : "");
 		unidad.setIdcliente(idCliente);
 		try{
-			boolean exito = unidadService.guardarNuevaUnidad(unidad);
-			if(exito){
-				cargarUnidadesDelCliente();
-				MensajeGrowl.mostrar("La unidad fue agregada exitosamente", FacesMessage.SEVERITY_INFO);
-			}else{
-				MensajeGrowl.mostrar("El cliente ya tiene registrada esa unidad", FacesMessage.SEVERITY_ERROR);
-			}
+			unidadService.guardarNuevaUnidad(unidad);
+			cargarUnidadesDelCliente();
+			MensajeGrowl.mostrar("La unidad fue agregada exitosamente", FacesMessage.SEVERITY_INFO);
 		}catch(Exception e){
 			MensajeGrowl.mostrar("Ocurrio un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
 		}
@@ -315,13 +313,10 @@ public class AdminView implements Serializable {
 			Unidad unidad = new Unidad();
 			unidad.setId(unidadSel);
 			unidad.setEco(eco.trim());
+			unidad.setSerie(serie != null ? serie.trim() : "");
 			unidad.setIdcliente(idCliente);
-			boolean exito = unidadService.ecoDuplicado(unidad);
-			if(exito){
-				MensajeGrowl.mostrar("El cliente ya tiene registrada esa unidad", FacesMessage.SEVERITY_ERROR);
-				return;
-			}
-			exito = unidadService.actualizarUnidad(unidad);
+			
+			boolean exito = unidadService.actualizarUnidad(unidad);
 			if(exito){
 				cargarUnidadesDelCliente();
 				MensajeGrowl.mostrar("La unidad fue actualizada exitosamente", FacesMessage.SEVERITY_INFO);
@@ -360,10 +355,28 @@ public class AdminView implements Serializable {
 	public void cargarUnidadesDelCliente(){
 		unidades.clear();
 		eco = "";
+		serie = "";
 		if(idCliente != 0){
 			unidades = unidadService.obtenerUnidadesPorIdCliente(idCliente);
 			if(unidades.isEmpty()){
 				unidades.add(generarUnidadVacia());
+			}else{
+				eco = unidades.get(0).getEco();
+				serie = unidades.get(0).getSerie();
+			}
+		}
+	}
+	
+	public void cambioUnidad(){
+		eco = "";
+		serie = "";
+		if(unidadSel != Constantes.LISTA_UNIDADES_VACIA){
+			for(Unidad unidad : unidades){
+				if(unidadSel == unidad.getId()){
+					eco = unidad.getEco();
+					serie = unidad.getSerie();
+					break;
+				}
 			}
 		}
 	}
@@ -553,6 +566,14 @@ public class AdminView implements Serializable {
 
 	public void setEco(String eco) {
 		this.eco = eco;
+	}
+
+	public String getSerie() {
+		return serie;
+	}
+
+	public void setSerie(String serie) {
+		this.serie = serie;
 	}
 	
 

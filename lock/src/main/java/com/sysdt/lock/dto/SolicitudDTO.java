@@ -5,16 +5,10 @@ import java.io.Serializable;
 public class SolicitudDTO implements Serializable{
 
 	private static final long serialVersionUID = 4357669810836595990L;
-	private int idUnidad;
+	private int idChofer;
 	private String latitud;
 	private String longitud;
 	
-	public int getIdUnidad() {
-		return idUnidad;
-	}
-	public void setIdUnidad(int idUnidad) {
-		this.idUnidad = idUnidad;
-	}
 	public String getLatitud() {
 		return latitud;
 	}
@@ -26,6 +20,12 @@ public class SolicitudDTO implements Serializable{
 	}
 	public void setLongitud(String longitud) {
 		this.longitud = longitud;
+	}
+	public int getIdChofer() {
+		return idChofer;
+	}
+	public void setIdChofer(int idChofer) {
+		this.idChofer = idChofer;
 	}
 	
 }

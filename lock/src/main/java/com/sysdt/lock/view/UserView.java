@@ -11,9 +11,12 @@ import javax.faces.bean.ViewScoped;
 
 import org.primefaces.context.RequestContext;
 
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 import com.sysdt.lock.dto.UsuarioDTO;
+import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.service.AperturaService;
+import com.sysdt.lock.service.ChoferService;
 import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
 import com.sysdt.lock.util.Constantes;
@@ -34,6 +37,9 @@ public class UserView implements Serializable{
 	@ManagedProperty("#{aperturaService}")
 	private AperturaService aperturaService;
 	
+	@ManagedProperty("#{choferService}")
+	private ChoferService choferService;
+	
 	@ManagedProperty("#{manejoSesionView}")
 	private ManejoSesionView manejoSesionView;
 	
@@ -42,7 +48,9 @@ public class UserView implements Serializable{
 	private String codigo;
 	private UsuarioDTO usuarioDTO;
 	private List<Unidad> unidades;
+	private List<Chofer> choferes;
 	private int idUnidad;
+	private int idChofer;
 	
 	
 	@PostConstruct
@@ -52,6 +60,10 @@ public class UserView implements Serializable{
 		if(unidades.isEmpty()){
 			unidades.add(generarUnidadVacia());
 		}
+		choferes = choferService.obtenerChoferesPorIdCliente(usuarioDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO);
+		if(choferes.isEmpty()){
+			choferes.add(generarChoferVacio());
+		}
 	}
 	
 	public void abrirChapa(){
@@ -60,13 +72,18 @@ public class UserView implements Serializable{
 			MensajeGrowl.mostrar("Debe seleccionar una unidad", FacesMessage.SEVERITY_WARN);
 			return;
 		}
-		unit = unidadService.obtenerUnidadPorEcoYidCliente(unit.getEco(), unit.getIdcliente());
-		if(unit.getToken() == null || unit.getToken().trim().isEmpty()){
-			MensajeGrowl.mostrar("La unidad no esta habilitada para apertura remota", FacesMessage.SEVERITY_ERROR);
+		Chofer chofer = obtenerChoferPorId();
+		if(chofer == null){
+			MensajeGrowl.mostrar("Debe seleccionar un chofer", FacesMessage.SEVERITY_WARN);
+			return;
+		}
+		chofer = choferService.obtenerChoferPorId(idChofer);
+		if(chofer.getToken() == null || chofer.getToken().trim().isEmpty()){
+			MensajeGrowl.mostrar("El chofer no esta habilitado para realizar la apertura remota", FacesMessage.SEVERITY_ERROR);
 			return;
 		}
 		try {
-			aperturaService.enviarSolicitudDeApertura(unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon());
+			aperturaService.enviarSolicitudDeApertura(idChofer, chofer.getToken(), unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon());
 			MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
 				+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
 		} catch (Exception e) {
@@ -79,6 +96,11 @@ public class UserView implements Serializable{
 		Unidad unidad = obtenerUnidadPorId();
 		if(unidad == null){
 			MensajeGrowl.mostrar("Debe seleccionar una unidad", FacesMessage.SEVERITY_WARN);
+			return;
+		}
+		Chofer chofer = obtenerChoferPorId();
+		if(chofer == null){
+			MensajeGrowl.mostrar("Debe seleccionar un chofer", FacesMessage.SEVERITY_WARN);
 			return;
 		}
 		if(validarClaves()){
@@ -112,11 +134,32 @@ public class UserView implements Serializable{
 		return null;
 	}
 	
+	private Chofer obtenerChoferPorId(){
+		if(idChofer == Constantes.LISTA_UNIDADES_VACIA){
+			return null;
+		}
+		for(Chofer chofer : choferes){
+			if(chofer.getId() == idChofer){
+				return chofer;
+			}
+		}
+		return null;
+	}
+	
 	private Unidad generarUnidadVacia(){
 		Unidad unidad = new Unidad();
 		unidad.setId(Constantes.LISTA_UNIDADES_VACIA);
 		unidad.setEco("No hay unidades disponibles");
 		return unidad;
+	}
+	
+	private Chofer generarChoferVacio(){
+		Chofer chofer = new Chofer();
+		chofer.setId(Constantes.LISTA_UNIDADES_VACIA);
+		chofer.setNombre("No hay choferes disponibles");
+		chofer.setApaterno("");
+		chofer.setAmaterno("");
+		return chofer;
 	}
 	
 	private void ocultarLoading(){
@@ -201,6 +244,30 @@ public class UserView implements Serializable{
 
 	public void setAperturaService(AperturaService aperturaService) {
 		this.aperturaService = aperturaService;
+	}
+
+	public List<Chofer> getChoferes() {
+		return choferes;
+	}
+
+	public void setChoferes(List<Chofer> choferes) {
+		this.choferes = choferes;
+	}
+
+	public ChoferService getChoferService() {
+		return choferService;
+	}
+
+	public void setChoferService(ChoferService choferService) {
+		this.choferService = choferService;
+	}
+
+	public int getIdChofer() {
+		return idChofer;
+	}
+
+	public void setIdChofer(int idChofer) {
+		this.idChofer = idChofer;
 	}
 
 	

@@ -71,8 +71,15 @@
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
 									<li>
 										<p:commandLink id="linkCodigos" 
-											value="Generación de Codigos"
+											value="Generación de Codigo y Apertura Remota"
 											action="#{manejoSesionView.redirigir(1)}" />
+									</li>
+								</c:if>
+								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1}">
+									<li>
+										<p:commandLink id="linkChoferes" 
+											value="Choferes"
+											action="#{manejoSesionView.redirigir(4)}" />
 									</li>
 								</c:if>
 								<li >
