@@ -77,15 +77,26 @@ public class UserView implements Serializable{
 			MensajeGrowl.mostrar("Debe seleccionar un chofer", FacesMessage.SEVERITY_WARN);
 			return;
 		}
-		chofer = choferService.obtenerChoferPorId(idChofer);
-		if(chofer.getToken() == null || chofer.getToken().trim().isEmpty()){
-			MensajeGrowl.mostrar("El chofer no esta habilitado para realizar la apertura remota", FacesMessage.SEVERITY_ERROR);
-			return;
-		}
+		
 		try {
-			aperturaService.enviarSolicitudDeApertura(idChofer, chofer.getToken(), unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon());
-			MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
-				+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
+			chofer = choferService.obtenerChoferPorId(idChofer);
+			if(chofer.getToken() == null || chofer.getToken().trim().isEmpty()){
+				MensajeGrowl.mostrar("El chofer no esta habilitado para realizar la apertura remota", FacesMessage.SEVERITY_ERROR);
+				return;
+			}
+			
+			if(validarClaves()){
+				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unit.getEco() , usuarioDTO.getIdCliente());
+				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
+				if(!codigo.trim().isEmpty()){
+					aperturaService.enviarSolicitudDeApertura(idChofer, chofer.getToken(), unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon(), codigo);
+					MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
+					+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
+				}else{
+					MensajeGrowl.mostrar("Las claves son incorrectas", FacesMessage.SEVERITY_ERROR);
+				}
+			}
+			
 		} catch (Exception e) {
 			MensajeGrowl.mostrar("No fue posible enviar la solicitud de apertura remota", FacesMessage.SEVERITY_FATAL);
 		}

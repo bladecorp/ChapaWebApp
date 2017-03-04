@@ -9,6 +9,7 @@ public class AperturaDTO implements Serializable{
 	private String eco;
 	private String serie;
 	private long tiempo;
+	private String codigo;
 	private boolean isWialon;
 	
 	public String getUsuario() {
@@ -40,6 +41,12 @@ public class AperturaDTO implements Serializable{
 	}
 	public void setSerie(String serie) {
 		this.serie = serie;
+	}
+	public String getCodigo() {
+		return codigo;
+	}
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
 	}
 	
 	

@@ -40,20 +40,21 @@ public class AperturaService{
 	@Autowired
 	private ChoferService choferService;
 	
-	public void enviarSolicitudDeApertura(int idChofer, String token, Unidad unidad, String usuario, boolean isWialon)throws Exception{
+	public void enviarSolicitudDeApertura(int idChofer, String token, Unidad unidad, String usuario, boolean isWialon, String codigo)throws Exception{
 		int resp = EnviarHttpPush(token, idChofer, unidad.getSerie());
 		if(resp != HttpStatus.SC_OK){
 			throw new Exception("Error al enviar mensaje. HTTP CODE: "+resp);
 		}
-		agregarAperturaAlistaDeEspera(idChofer, unidad.getEco(), unidad.getSerie(), usuario, isWialon);
+		agregarAperturaAlistaDeEspera(idChofer, unidad.getEco(), unidad.getSerie(), usuario, isWialon, codigo);
 	}
 	
-	private void agregarAperturaAlistaDeEspera(int idChofer, String eco, String serie, String usuario, boolean isWialon)throws Exception{
+	private void agregarAperturaAlistaDeEspera(int idChofer, String eco, String serie, String usuario, boolean isWialon, String codigo)throws Exception{
 		AperturaDTO apertura = new AperturaDTO();
 		apertura.setUsuario(usuario);
 		apertura.setEco(eco);
 		apertura.setSerie(serie);
 		apertura.setWialon(isWialon);
+		apertura.setCodigo(codigo);
 		apertura.setTiempo(System.currentTimeMillis());
 		aperturas.put(idChofer, apertura);
 	}
@@ -129,13 +130,15 @@ public class AperturaService{
 				historico.setPlacasEco(aperturaDTO.getEco());
 				historico.setFecha(new Date());
 				historico.setEstado(true);
-				historico.setLatitud(solicitud.getLatitud());
-				historico.setLongitud(solicitud.getLongitud());
+				historico.setLatitud(solicitud.getLatitud().trim());
+				historico.setLongitud(solicitud.getLongitud().trim());
+				historico.setIdtipoevento(Constantes.TipoEvento.APERTURA_CHAPA);
+				historico.setIdchofer(solicitud.getIdChofer());
 				historicoService.insertarHistoricoConCoordenadas(historico);
 			}
 			
 			respuesta.setAutorizacion(true);
-			respuesta.setMensaje("Se autoriza apertura de chapa");
+			respuesta.setMensaje(aperturaDTO.getCodigo());
 		}catch(Exception e){
 			respuesta.setMensaje("Ocurrio una excepcion: "+e.getMessage());
 		}
@@ -157,7 +160,7 @@ public class AperturaService{
 		try{
 			BigDecimal lat = new BigDecimal(solicitud.getLatitud());
 		}catch(NumberFormatException e){
-			respuesta.setMensaje("La valor de latitud es invalido");
+			respuesta.setMensaje("El valor de latitud es invalido");
 			return false;
 		}
 		
@@ -169,7 +172,7 @@ public class AperturaService{
 		try{
 			BigDecimal lon = new BigDecimal(solicitud.getLongitud());
 		}catch(NumberFormatException e){
-			respuesta.setMensaje("La valor de longitud es invalido");
+			respuesta.setMensaje("El valor de longitud es invalido");
 			return false;
 		}
 		
