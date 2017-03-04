@@ -42,16 +42,18 @@ public class HistoricoService {
 		return historicoConChofer(idCliente, historicoMapper.selectByExample(exHist));
 	}
 	
-	public void insertarHistorico(String username, String placasEco, boolean estado) throws Exception{
+	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer) throws Exception{
 		Historico historico = new Historico();
 		historico.setFecha(new Date());
 		historico.setUsername(username);
 		historico.setPlacasEco(placasEco.toUpperCase());
 		historico.setEstado(estado);
-		historicoMapper.insert(historico);
+		historico.setIdchofer(idChofer);
+		historico.setIdtipoevento(Constantes.TipoEvento.GENERACION_CODIGO);
+		insertarHistorico(historico);
 	}
 	
-	public void insertarHistoricoConCoordenadas(Historico historico)throws Exception{
+	public void insertarHistorico(Historico historico)throws Exception{
 		historicoMapper.insert(historico);
 	}
 	

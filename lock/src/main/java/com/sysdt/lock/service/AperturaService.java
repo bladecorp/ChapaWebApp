@@ -134,7 +134,7 @@ public class AperturaService{
 				historico.setLongitud(solicitud.getLongitud().trim());
 				historico.setIdtipoevento(Constantes.TipoEvento.APERTURA_CHAPA);
 				historico.setIdchofer(solicitud.getIdChofer());
-				historicoService.insertarHistoricoConCoordenadas(historico);
+				historicoService.insertarHistorico(historico);
 			}
 			
 			respuesta.setAutorizacion(true);

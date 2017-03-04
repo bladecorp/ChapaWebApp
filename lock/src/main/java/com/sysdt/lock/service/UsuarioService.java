@@ -98,19 +98,19 @@ public class UsuarioService {
 		return dependientes;
 	}
 	
-	public String generarCodigo(String clave1, String clave2, String username, String placasEco, int idCliente)throws Exception {
+	public String generarCodigo(String clave1, String clave2, String username, String placasEco, int idCliente, int idChofer)throws Exception {
 		String codigo = "";
 		try {
 			Security security = new Security();
 			codigo = security.convertirLlaves(clave1, clave2, idCliente);
 			if(codigo != null){
-				historicoService.insertarHistorico(username, placasEco, true);
+				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, true, idChofer);
 			}else{
-				historicoService.insertarHistorico(username, placasEco, false);
+				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
 				codigo = "";
 			}
 		} catch (Exception e) {
-			historicoService.insertarHistorico(username, placasEco, false);
+			historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
 			throw new Exception("Error al convertir claves");
 		}
 		

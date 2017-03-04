@@ -21,6 +21,7 @@ import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
 import com.sysdt.lock.util.Constantes;
 import com.sysdt.lock.util.MensajeGrowl;
+import com.sysdt.lock.util.Security;
 
 @ManagedBean
 @ViewScoped
@@ -86,9 +87,10 @@ public class UserView implements Serializable{
 			}
 			
 			if(validarClaves()){
-				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unit.getEco() , usuarioDTO.getIdCliente());
+				Security security = new Security();
+				codigo = security.convertirLlaves(clave1, clave2, usuarioDTO.getIdCliente());
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
-				if(!codigo.trim().isEmpty()){
+				if(codigo != null && !codigo.trim().isEmpty()){
 					aperturaService.enviarSolicitudDeApertura(idChofer, chofer.getToken(), unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon(), codigo);
 					MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
 					+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
@@ -116,7 +118,7 @@ public class UserView implements Serializable{
 		}
 		if(validarClaves()){
 			try {
-				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente());
+				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente(), chofer.getId());
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
 			} catch (Exception e) {
 				MensajeGrowl.mostrar("Ocurrio un error al generar el codigo: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
