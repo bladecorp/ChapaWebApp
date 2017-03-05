@@ -58,33 +58,33 @@
 							<ul class="nav navbar-nav navbar-right">
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1}">
 									<li>
-										<p:commandLink id="linkAdmin" 
+										<p:commandLink id="linkAdmin" onclick="PF('statusDialog').show();"
 											value="Administración" action="#{manejoSesionView.redirigir(3)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
 									<li>
-										<p:commandLink id="linkReportes" 
+										<p:commandLink id="linkReportes" onclick="PF('statusDialog').show();"
 											value="Reportes" action="#{manejoSesionView.redirigir(2)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
 									<li>
-										<p:commandLink id="linkCodigos" 
+										<p:commandLink id="linkCodigos" onclick="PF('statusDialog').show();"
 											value="Generación de Codigo y Apertura Remota"
 											action="#{manejoSesionView.redirigir(1)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1}">
 									<li>
-										<p:commandLink id="linkChoferes" 
+										<p:commandLink id="linkChoferes" onclick="PF('statusDialog').show();"
 											value="Choferes"
 											action="#{manejoSesionView.redirigir(4)}" />
 									</li>
 								</c:if>
 								<li >
 									<p:commandLink styleClass="btn btn-danger" style="color:white;"
-										value="Cerrar Sesión"
+										value="Cerrar Sesión" onclick="PF('statusDialog').show();"
 										action="#{manejoSesionView.cerrarSesionUsuario}" />
 								</li>
 							</ul>
@@ -98,7 +98,7 @@
 			NO CONTENT
 		</ui:insert>
 		<ui:insert name="footer">
-			<p:dialog id="statusDialog" widgetVar="statusDialog" modal="false" draggable="false" 
+			<p:dialog id="statusDialog" widgetVar="statusDialog" modal="true" draggable="false" 
 						closable="false" resizable="false" showHeader="false" styleClass="customDialog">
 				<p:graphicImage value="resources/imgs/ring.svg" height="300" width="300" />
 			</p:dialog>
