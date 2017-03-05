@@ -61,16 +61,10 @@
 		<property name="jdbcUrl" value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_494512d819a01c5?reconnect=true" />
 		<property name="user" value="b5af500461c6d2" />
 		<property name="password" value="03304419" />
-		<property name="properties">
-            <props>
-<!--                 <prop key="c3p0.acquire_increment">5</prop> -->
-                <prop key="c3p0.idle_test_period">50</prop>
-                <prop key="c3p0.validationQuery">SELECT 1</prop>
-<!--                 <prop key="c3p0.max_size">4</prop> -->
-<!--                 <prop key="c3p0.max_statements">0</prop> -->
-<!--                 <prop key="c3p0.min_size">1</prop> -->
-            </props>
-        </property>
+		<property name="maxPoolSize" value="4" />
+		<property name="idleConnectionTestPeriod" value="55" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+<!-- 		<property name="testOnBorrow" value="true" /> -->
 	</bean>
 
 </beans>
