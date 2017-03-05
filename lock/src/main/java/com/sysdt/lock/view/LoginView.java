@@ -81,7 +81,7 @@ public class LoginView implements Serializable{
 			
 		}catch(Exception e){
 		//	RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
-			MensajeGrowl.mostrar("Ocurrió una excepcion: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("OcurriÃ³ una excepcion: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
 		}
 	}
 	
