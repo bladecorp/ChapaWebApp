@@ -66,7 +66,7 @@ public class ManejoSesionView implements Serializable{
 					ec.redirect("login.xhtml");
 				}
 			} catch (IOException e) {
-				MensajeGrowl.mostrar("No se pudo obtener al usuario y ocurrio un error al redirigir", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("No se pudo obtener al usuario y ocurrió un error al redirigir", FacesMessage.SEVERITY_FATAL);
 			}
 		}
 		return usuarioDTO;
@@ -79,12 +79,12 @@ public class ManejoSesionView implements Serializable{
 			client = !client.contentEquals("SYSDT")?"?c="+client:"";
 			ec.invalidateSession();
 			try {
-				MensajeGrowl.mostrar("La sesion se cerro exitosamente", FacesMessage.SEVERITY_INFO);
+				MensajeGrowl.mostrar("La sesión se cerró exitosamente", FacesMessage.SEVERITY_INFO);
 				ec.getFlash().setKeepMessages(true);
 				String url = "login.xhtml"+client;
 				ec.redirect(url);
 			} catch (IOException e) {
-				MensajeGrowl.mostrar("Ocurrio un error al redirigir al Login", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("Ocurrió un error al redirigir al Login", FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}

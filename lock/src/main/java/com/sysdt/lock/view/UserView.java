@@ -82,7 +82,7 @@ public class UserView implements Serializable{
 		try {
 			chofer = choferService.obtenerChoferPorId(idChofer);
 			if(chofer.getToken() == null || chofer.getToken().trim().isEmpty()){
-				MensajeGrowl.mostrar("El chofer no esta habilitado para realizar la apertura remota", FacesMessage.SEVERITY_ERROR);
+				MensajeGrowl.mostrar("El chofer no está habilitado para realizar la apertura remota", FacesMessage.SEVERITY_ERROR);
 				return;
 			}
 			
@@ -121,7 +121,7 @@ public class UserView implements Serializable{
 				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente(), chofer.getId());
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Ocurrio un error al generar el codigo: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("Ocurrió un error al generar el código: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}

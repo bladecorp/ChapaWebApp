@@ -97,7 +97,7 @@ public class AdminView implements Serializable {
 				if(exito){
 					usuario = new Usuario();
 					usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
-					MensajeGrowl.mostrar("El usuario se guardo exitosamente", FacesMessage.SEVERITY_INFO);
+					MensajeGrowl.mostrar("El usuario se guardó exitosamente", FacesMessage.SEVERITY_INFO);
 				}else{
 					MensajeGrowl.mostrar("El nombre de usuario ya existe", FacesMessage.SEVERITY_ERROR);
 				}
@@ -114,7 +114,7 @@ public class AdminView implements Serializable {
 				clienteService.insertarCliente(cliente);
 				clientes = clienteService.obtenerClientes();
 				cliente = new Cliente();
-				MensajeGrowl.mostrar("El cliente se guardo exitosamente", FacesMessage.SEVERITY_INFO);;
+				MensajeGrowl.mostrar("El cliente se guardó exitosamente", FacesMessage.SEVERITY_INFO);;
 			} catch (Exception e) {
 				MensajeGrowl.mostrar("Error al guardar cliente", FacesMessage.SEVERITY_FATAL);
 			}
@@ -237,7 +237,7 @@ public class AdminView implements Serializable {
 			dependenciaService.guardarDependencias(listaAsociados, usuarioSel.getUsername(), usuarioSel.getIdTipousuario());
 			MensajeGrowl.mostrar("Asociados guardados correctamente", FacesMessage.SEVERITY_INFO);
 		} catch (Exception e) {
-			MensajeGrowl.mostrar("Ocurrio una excepcion al guardar asociados", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrió una excepcion al guardar asociados", FacesMessage.SEVERITY_FATAL);
 		}
 	}
 	
@@ -274,7 +274,7 @@ public class AdminView implements Serializable {
 			return;
 		}
 		if(eco == null || eco.trim().isEmpty()){
-			MensajeGrowl.mostrar("Debe escribir el numero economico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
+			MensajeGrowl.mostrar("Debe escribir el número económico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
 			return;
 		}
 		Unidad unidad = new Unidad();
@@ -287,7 +287,7 @@ public class AdminView implements Serializable {
 			cargarUnidadesDelCliente();
 			MensajeGrowl.mostrar("La unidad fue agregada exitosamente", FacesMessage.SEVERITY_INFO);
 		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrio un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrió un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
 		}
 	}
 	
@@ -305,7 +305,7 @@ public class AdminView implements Serializable {
 			return;
 		}
 		if(eco == null || eco.trim().isEmpty()){
-			MensajeGrowl.mostrar("Debe escribir el nuevo numero economico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
+			MensajeGrowl.mostrar("Debe escribir el nuevo número económico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
 			return;
 		}
 		
@@ -321,11 +321,11 @@ public class AdminView implements Serializable {
 				cargarUnidadesDelCliente();
 				MensajeGrowl.mostrar("La unidad fue actualizada exitosamente", FacesMessage.SEVERITY_INFO);
 			}else{
-				MensajeGrowl.mostrar("No se pudo actualizar porque no se encontro el registro de la unidad", FacesMessage.SEVERITY_ERROR);
+				MensajeGrowl.mostrar("No se pudo actualizar porque no se encontró el registro de la unidad", FacesMessage.SEVERITY_ERROR);
 			}
 			
 		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrio un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrió un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
 		}
 		
 	}
@@ -345,10 +345,10 @@ public class AdminView implements Serializable {
 				cargarUnidadesDelCliente();
 				MensajeGrowl.mostrar("La unidad fue eliminada exitosamente", FacesMessage.SEVERITY_INFO);
 			}else{
-				MensajeGrowl.mostrar("No se pudo eliminar porque no se encontro el registro de la unidad", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("No se pudo eliminar porque no se encontró el registro de la unidad", FacesMessage.SEVERITY_FATAL);
 			}
 		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrio un error al eliminar la unidad", FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrió un error al eliminar la unidad", FacesMessage.SEVERITY_FATAL);
 		}
 	}
 	

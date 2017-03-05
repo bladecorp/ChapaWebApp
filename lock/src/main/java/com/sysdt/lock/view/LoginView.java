@@ -58,7 +58,7 @@ public class LoginView implements Serializable{
 				RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
 			}
 		}else{
-			MensajeGrowl.mostrar("Debe escribir usuario y password ó", FacesMessage.SEVERITY_ERROR);
+			MensajeGrowl.mostrar("Debe escribir usuario y password", FacesMessage.SEVERITY_ERROR);
 			RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
 		}
 	}
@@ -81,7 +81,7 @@ public class LoginView implements Serializable{
 			
 		}catch(Exception e){
 		//	RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
-			MensajeGrowl.mostrar("Ocurrio una excepcion: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
+			MensajeGrowl.mostrar("Ocurrió una excepción: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);
 		}
 	}
 	

@@ -51,9 +51,9 @@ public class ChoferView implements Serializable{
 			try {
 				choferService.insertarChofer(chofer);
 				recargarTabla();
-				MensajeGrowl.mostrar("El registro se guardo exitosamente", FacesMessage.SEVERITY_INFO);
+				MensajeGrowl.mostrar("El registro se guardó exitosamente", FacesMessage.SEVERITY_INFO);
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Ocurrio un error al guardar el registro", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("Ocurrió un error al guardar el registro", FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}
@@ -65,12 +65,12 @@ public class ChoferView implements Serializable{
 				boolean exito = choferService.actualizarChofer(chofer);
 				if(exito){
 					recargarTabla();
-					MensajeGrowl.mostrar("El registro se actualizo exitosamente", FacesMessage.SEVERITY_INFO);
+					MensajeGrowl.mostrar("El registro se actualizó exitosamente", FacesMessage.SEVERITY_INFO);
 				}else{
 					MensajeGrowl.mostrar("No fue posible actualizar el registro", FacesMessage.SEVERITY_ERROR);
 				}
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Ocurrio un error al guardar el registro", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar("Ocurrió un error al guardar el registro", FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}
