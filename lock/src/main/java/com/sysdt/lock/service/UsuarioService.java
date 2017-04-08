@@ -107,7 +107,7 @@ public class UsuarioService {
 				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, true, idChofer);
 			}else{
 				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
-				codigo = "";
+				codigo = "Generar nuevo codigo";
 			}
 		} catch (Exception e) {
 			historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
