@@ -84,8 +84,10 @@ public class ClienteService {
 		for (Usuario usuario : usuarios) {
 			usuario.setPassword("");
 			List<Email> correos = emailService.obtenerCorreosPorUsername(usuario.getUsername());
-			UsuarioEmail usuarioEmail = new UsuarioEmail(usuario, correos);
-			usersEmail.add(usuarioEmail);
+			if(correos.size() > 0){
+				UsuarioEmail usuarioEmail = new UsuarioEmail(usuario, correos);
+				usersEmail.add(usuarioEmail);
+			}
 		}
 		return usersEmail;
 	}
