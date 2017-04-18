@@ -70,7 +70,7 @@ public class ValidarVigenciaPassword implements ResourceLoaderAware{
 		StringBuilder contenido = new StringBuilder();
 		contenido.append("<html><body> "+
 				"<br> Apreciable Usuario: <strong>"+usuario.getUsername()+"</strong> <br><br>Su password expira el <strong>"+Utilerias.fechaEnString(usuario.getCaducidadpassword())+"</strong> "
-				+ "<br><br> Ingrese en la siguiente liga para realizar la renovación.<br><br>"
+				+ "<br><br> Ingrese en la siguiente liga para realizar la renovaci&oacute;n.<br><br>"
 				+ "<div style='width:100%;text-align:center;'>"
 				+ "<a style='font-size:25px;text-decoration:none;font-family:fantasy;' href='https://lockwebapp.herokuapp.com/?c="+cliente+"'>Sistema Lock</a>"
 				+ "<br><br><img style='width:180px;height:100px;' src='cid:imagen' /></div>"
