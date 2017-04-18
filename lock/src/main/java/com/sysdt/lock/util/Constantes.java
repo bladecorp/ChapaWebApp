@@ -1,18 +1,13 @@
 package com.sysdt.lock.util;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-
-import com.sysdt.lock.dto.PushBotsDTO;
-import com.sysdt.lock.service.AperturaService;
-
+import java.util.regex.Pattern;
 
 public class Constantes {
 	
 	public static final int LISTA_UNIDADES_VACIA = -1;
 	public static final int TIEMPO_MAXIMO_ESPERA_EN_SEGUNDOS = 30;
+	public static final Pattern EMAIL_VALIDATOR = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+	public static final int DIAS_FUTURO = 3;
 	
 	public class TipoUsuario {
 		public static final int ADMINISTRADOR = 1;

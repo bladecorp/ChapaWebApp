@@ -11,7 +11,6 @@ import javax.faces.bean.ViewScoped;
 
 import org.primefaces.context.RequestContext;
 
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Unidad;
@@ -173,10 +172,6 @@ public class UserView implements Serializable{
 		chofer.setApaterno("");
 		chofer.setAmaterno("");
 		return chofer;
-	}
-	
-	private void ocultarLoading(){
-		RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
 	}
 
 	public UsuarioService getUsuarioService() {

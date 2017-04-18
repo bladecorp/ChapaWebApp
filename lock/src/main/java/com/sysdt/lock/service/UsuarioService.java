@@ -3,13 +3,11 @@ package com.sysdt.lock.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sysdt.lock.dao.UsuarioMapper;
-import com.sysdt.lock.dto.UserDTO;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Cliente;
 import com.sysdt.lock.model.Usuario;
@@ -17,6 +15,7 @@ import com.sysdt.lock.model.UsuarioExample;
 import com.sysdt.lock.model.UsuarioExample.Criteria;
 import com.sysdt.lock.util.Constantes;
 import com.sysdt.lock.util.Security;
+import com.sysdt.lock.util.Utilerias;
 
 @Service
 @Transactional
@@ -30,8 +29,18 @@ public class UsuarioService {
 	private HistoricoService historicoService;
 	@Autowired
 	private DependenciaService dependenciaService;
+	@Autowired
+	private EmailService emailService;
 	
-	public UsuarioDTO obtenerYvalidarUsuario(String username, String password, String nombreCliente) throws Exception{
+	public void actualizarPassword(String username, String password, String nuevoPassword) throws Exception{
+		Usuario usuario = validarUsuario(username, password, nuevoPassword);
+		Cliente cliente = clienteService.obtenerClientePorId(usuario.getIdCliente());
+		usuario.setPassword(nuevoPassword);
+		usuario.setCaducidadpassword(Utilerias.fechaSumarDias(cliente.getPeriodovalidacion()));
+		actualizarUsuario(usuario);
+	}
+	
+	private Usuario validarUsuario(String username, String password, String nuevoPassword)throws Exception{
 		Usuario usuario = obtenerUsuarioPorUsername(username);
 		if(usuario == null){
 			throw new Exception("Usuario invalido");
@@ -39,19 +48,33 @@ public class UsuarioService {
 			throw new Exception("Su cuenta esta deshabilitada. Por favor consulte a su proveedor");
 		}else if(!usuario.getPassword().contentEquals(password)){
 			throw new Exception("Password incorrecto");
+		}else if(nuevoPassword != null && usuario.getPassword().contentEquals(nuevoPassword)){
+			throw new Exception("El nuevo password no puede ser igual al anterior");
 		}
+		return usuario;
+	}
+	
+	public UsuarioDTO obtenerYvalidarUsuario(String username, String password, String nombreCliente) throws Exception{
+		Usuario usuario = validarUsuario(username, password, null);
 		Cliente cliente = clienteService.obtenerClientePorId(usuario.getIdCliente());
 		if(!cliente.getNombre().contentEquals(nombreCliente.toUpperCase())){
 			throw new Exception("Usuario no coincide con url");
 		}
+		if(cliente.getPeriodovalidacion() > 0 && Utilerias.excedeVigencia(usuario.getCaducidadpassword()) ){
+			throw new Exception("Debe actualizar su password para poder acceder al sistema");
+		}
 		return copiarUsuario(usuario, cliente);
 	}
 	
-	public boolean guardarUsuario(Usuario usuario)throws Exception{
+	public boolean guardarUsuario(Usuario usuario, String email, int clienteCaducidad)throws Exception{
 		usuarioTrim(usuario);
 		Usuario user = obtenerUsuarioPorUsername(usuario.getUsername());
 		if(user == null){
+			usuario.setCaducidadpassword(Utilerias.fechaSumarDias(clienteCaducidad));
 			insertarUsuario(usuario);
+			if(!email.trim().isEmpty()){
+				emailService.insertarEmail(email.trim(), usuario.getUsername());
+			}
 			return true;
 		}
 		return false;
@@ -117,6 +140,15 @@ public class UsuarioService {
 		return codigo;
 	}
 	
+	public void actualizarUsuarioCompleto(Usuario usuario, String email) throws Exception{
+		actualizarUsuario(usuario);
+		emailService.eliminarEmailsPorUsername(usuario.getUsername());
+		if(!email.trim().isEmpty()){
+			emailService.insertarEmail(email, usuario.getUsername());
+		}
+	}
+	
+	
 	//********* METODOS SIMPLES ******///
 	
 	private void insertarUsuario(Usuario usuario) throws Exception{
@@ -124,7 +156,7 @@ public class UsuarioService {
 		usuarioMapper.insert(usuario);
 	}
 	
-	public void actualizarUsuario(Usuario usuario) throws Exception{
+	private void actualizarUsuario(Usuario usuario) throws Exception{
 		usuarioMapper.updateByPrimaryKey(usuario);
 	}
 	
@@ -157,5 +189,7 @@ public class UsuarioService {
 		usuario.setUsername(usuario.getUsername().trim().toLowerCase());
 		usuario.setPassword(usuario.getPassword().trim().toLowerCase());
 	}
+	
+	
 	
 }

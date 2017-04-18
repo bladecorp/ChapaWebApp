@@ -53,6 +53,19 @@
 											</div>
 										</div>
 										<div class="form-group">
+											<h:outputLabel value="Email"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputEmail" styleClass="form-control"
+														style="text-align:center;"
+														value="#{adminView.email}" />
+													<span class="input-group-addon"><i class="fa fa-lock"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
 											<h:outputLabel value="Cliente"
 												styleClass="control-label col-sm-3" />
 											<div class="col-sm-9">
@@ -80,7 +93,7 @@
 												<p:commandButton value="AGREGAR"
 													styleClass="btn btn-primary form-control"
 													action="#{adminView.guardarUsuario}" 
-													update="dtUsuarios, inputUsername, inputPassword" 
+													update="dtUsuarios, inputUsername, inputPassword, inputEmail" 
 													onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 											</div>
 										</div>
@@ -275,7 +288,7 @@
 												<div class="col-sm-10">
 													<h:selectOneMenu id="inputClienteSel" styleClass="form-control"
 														value="#{adminView.clienteSel}">
-														<p:ajax event="change" update="dtUsuarios,form:editUsername, form:editPass, 
+														<p:ajax event="change" update="dtUsuarios,form:editUsername, form:editPass, form:editEmail,
 															form:asociarSel, form:dtAsociados, form:btnActAs, form:btnDelAs, form:btnAgAs"
 															listener="#{adminView.cambioCliente}"  
 															onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
@@ -292,7 +305,7 @@
 											var="user" reflow="true" selectionMode="single" 
 											selection="#{adminView.usuarioSel}" rowKey="#{user.username}">
 											<p:ajax event="rowSelect" listener="#{adminView.obtenerDependientes}"
-												update="form:editUsername, form:editPass, form:editTipo, 
+												update="form:editUsername, form:editPass, form:editEmail, form:editTipo, 
 													form:editEstado, form:asociarSel, form:dtAsociados, 
 													form:btnActAs, form:btnDelAs, form:btnAgAs" 
 												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
@@ -357,6 +370,10 @@
 												<p:inputText id="editPass" value="#{adminView.usuarioSel.password}" styleClass="form-control"/>
 											</div>
 											<div class="form-group">
+												<h:outputText value="Email" />
+												<p:inputText id="editEmail" value="#{adminView.emailSel}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
 												<h:outputText value="Tipo" />
 												<h:selectOneMenu id="editTipo" styleClass="form-control" 
 														value="#{adminView.usuarioSel.idTipousuario}">
@@ -375,7 +392,7 @@
 											<div class="form-group">
 												<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
 													<p:commandButton action="#{adminView.eliminarUsuario}" styleClass="btn btn-danger form-control"
-														update="dtUsuarios, form:editUsername, form:editPass" icon="fa fa-trash"
+														update="dtUsuarios, form:editUsername, form:editPass, form:editEmail" icon="fa fa-trash"
 														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()">
 													</p:commandButton>
 												</div>

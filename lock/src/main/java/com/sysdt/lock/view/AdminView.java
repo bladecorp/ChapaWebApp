@@ -10,19 +10,16 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
-import org.primefaces.context.RequestContext;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.sun.faces.util.MostlySingletonSet;
-import com.sysdt.lock.dto.UserDTO;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Cliente;
+import com.sysdt.lock.model.Email;
 import com.sysdt.lock.model.TipoUsuario;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.CatalogoService;
 import com.sysdt.lock.service.ClienteService;
 import com.sysdt.lock.service.DependenciaService;
+import com.sysdt.lock.service.EmailService;
 import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
 import com.sysdt.lock.util.Constantes;
@@ -45,6 +42,8 @@ public class AdminView implements Serializable {
 	private DependenciaService dependenciaService;
 	@ManagedProperty("#{unidadService}")
 	private UnidadService unidadService;
+	@ManagedProperty("#{emailService}")
+	private EmailService emailService;
 //	@ManagedProperty("#{userDTO}")
 //	private UserDTO userDTO;
 	
@@ -60,6 +59,10 @@ public class AdminView implements Serializable {
 	private Usuario usuario;
 	private Usuario usuarioSel;
 	private int clienteSel;
+	
+	//Seccion Email
+	private String email;
+	private String emailSel;
 	
 	//SECCION ASOCIADOS
 	private String nuevoAsociado;
@@ -93,7 +96,9 @@ public class AdminView implements Serializable {
 	public void guardarUsuario(){
 		if(validarUsuario()){
 			try {
-				boolean exito = usuarioService.guardarUsuario(usuario);
+				Cliente cliente = buscarClientePorId(usuario.getIdCliente());
+				int periodoValidacion = cliente.getPeriodovalidacion() != null ? cliente.getPeriodovalidacion() : 0;
+				boolean exito = usuarioService.guardarUsuario(usuario, email, periodoValidacion);
 				if(exito){
 					usuario = new Usuario();
 					usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
@@ -107,7 +112,6 @@ public class AdminView implements Serializable {
 		}
 	}
 
-	
 	public void guardarCliente(){
 		if(validarCliente()){
 			try {
@@ -124,7 +128,7 @@ public class AdminView implements Serializable {
 	public void actualizarUsuario(){
 		if(validarUsuarioSel()){
 			try {
-				usuarioService.actualizarUsuario(usuarioSel);
+				usuarioService.actualizarUsuarioCompleto(usuarioSel, emailSel);
 				usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
 				MensajeGrowl.mostrar("Usuario actualizado exitosamente", FacesMessage.SEVERITY_INFO);
 			} catch (Exception e) {
@@ -183,6 +187,10 @@ public class AdminView implements Serializable {
 			MensajeGrowl.mostrar("Debe indicar el tipo de usuario", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
+		if(!email.trim().isEmpty() && !Constantes.EMAIL_VALIDATOR.matcher(email.trim()).matches()){
+			MensajeGrowl.mostrar("El email es inválido", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
 		return true;
 	}
 	
@@ -197,6 +205,10 @@ public class AdminView implements Serializable {
 		}
 		if(usuarioSel.getPassword().trim().isEmpty()){
 			MensajeGrowl.mostrar("Debe indicar el password", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(!emailSel.trim().isEmpty() && !Constantes.EMAIL_VALIDATOR.matcher(emailSel.trim()).matches()){
+			MensajeGrowl.mostrar("El email es inválido", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
 		if(usuarioSel.getIdTipousuario() == null){
@@ -242,6 +254,8 @@ public class AdminView implements Serializable {
 	}
 	
 	public void obtenerDependientes(){
+		List<Email> correos = emailService.obtenerCorreosPorUsername(usuarioSel.getUsername());
+		emailSel = correos.size() > 0 ? correos.get(0).getDireccion() : "";
 		if(usuarioSel.getIdTipousuario() == Constantes.TipoUsuario.OPERADOR || 
 				usuarioSel.getIdTipousuario() == Constantes.TipoUsuario.SUPERVISOR){
 			disableAsociado = false;
@@ -266,6 +280,7 @@ public class AdminView implements Serializable {
 		usuarioSel = new Usuario();
 		usuarioSel.setUsername("");
 		usuarioSel.setPassword("");
+		emailSel = "";
 	}
 	
 	public void guardarUnidad(){
@@ -388,10 +403,15 @@ public class AdminView implements Serializable {
 		return unidad;
 	}
 	
-	private void ocultarLoading(){
-		RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
+	private Cliente buscarClientePorId(int idCliente){
+		for(Cliente cliente : clientes){
+			if(cliente.getId() == idCliente){
+				return cliente;
+			}
+		}
+		return null;
 	}
-
+	
 	public ManejoSesionView getManejoSesionView() {
 		return manejoSesionView;
 	}
@@ -574,6 +594,30 @@ public class AdminView implements Serializable {
 
 	public void setSerie(String serie) {
 		this.serie = serie;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getEmailSel() {
+		return emailSel;
+	}
+
+	public void setEmailSel(String emailSel) {
+		this.emailSel = emailSel;
+	}
+
+	public EmailService getEmailService() {
+		return emailService;
+	}
+
+	public void setEmailService(EmailService emailService) {
+		this.emailService = emailService;
 	}
 	
 

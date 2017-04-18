@@ -12,10 +12,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.context.RequestContext;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.sysdt.lock.dto.UserDTO;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Cliente;
 import com.sysdt.lock.service.ClienteService;
@@ -41,9 +38,60 @@ public class LoginView implements Serializable{
 	private String nombreCliente;
 	private Cliente cliente;
 	
+	//para cambiar password
+	private boolean editar;
+	private String passNuevo;
+	private String passConf;
+	
 	@PostConstruct
 	public void init(){ 
 	//	userDTO = new UserDTO();
+	}
+	
+	public void cambiarPassword(boolean seEdita){
+		editar = seEdita;
+		username = "";
+		password = "";
+		passNuevo = "";
+		passConf = "";
+	}
+	
+	private boolean validarDatosActualizacion(){
+		if(username.trim().isEmpty()){
+			MensajeGrowl.mostrar("Indique el usuario", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(password.trim().isEmpty()){
+			MensajeGrowl.mostrar("Indique el password actual", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(passNuevo.trim().isEmpty()){
+			MensajeGrowl.mostrar("Indique el nuevo password", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(passConf.trim().isEmpty()){
+			MensajeGrowl.mostrar("Confirme el nuevo password", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(!passNuevo.contentEquals(passConf)){
+			MensajeGrowl.mostrar("El nuevo password y la confirmación no coinciden", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public void actualizarPassword(){
+		if(validarDatosActualizacion()){
+			try {
+				usuarioService.actualizarPassword(username, password, passNuevo.trim());
+				MensajeGrowl.mostrar("Password actualizado exitosamente", FacesMessage.SEVERITY_INFO);
+				editar = false;
+			} catch (Exception e) {
+				MensajeGrowl.mostrar(e.getMessage(), FacesMessage.SEVERITY_ERROR);
+			}
+		}
+		RequestContext.getCurrentInstance().execute("PF('statusDialog').hide();");
 	}
 	
 	public void ingresar(){
@@ -160,5 +208,28 @@ public class LoginView implements Serializable{
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}
-	
+
+	public String getPassNuevo() {
+		return passNuevo;
+	}
+
+	public void setPassNuevo(String passNuevo) {
+		this.passNuevo = passNuevo;
+	}
+
+	public String getPassConf() {
+		return passConf;
+	}
+
+	public void setPassConf(String passConf) {
+		this.passConf = passConf;
+	}
+
+	public boolean isEditar() {
+		return editar;
+	}
+
+	public void setEditar(boolean editar) {
+		this.editar = editar;
+	}
 }

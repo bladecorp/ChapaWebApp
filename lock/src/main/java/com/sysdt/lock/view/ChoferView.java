@@ -19,6 +19,8 @@ import com.sysdt.lock.util.MensajeGrowl;
 @ViewScoped
 public class ChoferView implements Serializable{
 	
+	private static final long serialVersionUID = 1L;
+	
 	@ManagedProperty("#{choferService}")
 	private ChoferService choferService;
 	@ManagedProperty("#{manejoSesionView}")

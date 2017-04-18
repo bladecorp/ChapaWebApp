@@ -18,8 +18,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
-		<java.version>1.8</java.version>
+
+		<java.version>1.6</java.version>
 		<commons.logging.version>1.2</commons.logging.version>
 		<log4j.version>1.2.16</log4j.version>
 		<c3p0.version>0.9.1.2</c3p0.version>
@@ -36,6 +36,9 @@
 		<apache.poi>3.13</apache.poi>
 		<apache-cxf.version>3.0.3</apache-cxf.version>
 		<apache-http.version>4.5</apache-http.version>
+		<java.mail.version>1.4.7</java.mail.version>
+		<commons.io.version>2.4</commons.io.version>
+		<quartz.version>2.2.1</quartz.version>
 	</properties>
 
 	<dependencies>
@@ -122,13 +125,13 @@
 		</dependency>
 
 		<!-- DEPENDENCIAS PARA EXPORTAR -->
-			<!-- PDF -->
+		<!-- PDF -->
 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>${lowagie.version}</version>
 		</dependency>
-			<!-- EXCEL Y OTROS -->
+		<!-- EXCEL Y OTROS -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -168,7 +171,7 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -179,13 +182,32 @@
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${apache-cxf.version}</version>
 		</dependency>
-		
+
 		<!-- Dependencia http -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${apache-http.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>${java.mail.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
+		</dependency>
+
+			<!-- Dependencia Quartz -->
+			<!-- <dependency> -->
+			<!-- <groupId>org.quartz-scheduler</groupId> -->
+			<!-- <artifactId>quartz</artifactId> -->
+			<!-- <version>${quartz.version}</version> -->
+			<!-- </dependency> -->
+
 
 	</dependencies>
 	<build>
@@ -207,31 +229,31 @@
 				<artifactId>mybatis-generator-maven-plugin</artifactId>
 				<version>${mybatis.generator.version}</version>
 			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.github.jsimone</groupId>
-									<artifactId>webapp-runner</artifactId>
-									<version>8.0.30.2</version>
-									<destFileName>webapp-runner.jar</destFileName>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
+
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- <version>2.3</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <phase>package</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>copy</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <artifactItems> -->
+			<!-- <artifactItem> -->
+			<!-- <groupId>com.github.jsimone</groupId> -->
+			<!-- <artifactId>webapp-runner</artifactId> -->
+			<!-- <version>8.0.30.2</version> -->
+			<!-- <destFileName>webapp-runner.jar</destFileName> -->
+			<!-- </artifactItem> -->
+			<!-- </artifactItems> -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+
 		</plugins>
 
 	</build>

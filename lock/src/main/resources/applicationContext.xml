@@ -5,12 +5,35 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:cxf="http://cxf.apache.org/core"
 	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
 
+	<bean id="runScheduler" class="com.sysdt.lock.schedule.ValidarVigenciaPassword" />
+	<task:scheduled-tasks>
+		<task:scheduled ref="runScheduler" method="validarVigencias" cron="0 14 3 ? * *"/>
+<!-- 		<task:scheduled ref="runScheduler" method="validarVigencias" cron="*/55 * * * * *"/> -->
+	</task:scheduled-tasks>
+	
+	<bean id="mailSender" class ="org.springframework.mail.javamail.JavaMailSenderImpl" >
+		<property name="host"><value>smtp.gmail.com</value></property>
+        <property name="port"><value>587</value></property>
+        <property name="protocol"><value>smtp</value></property>
+        <property name="username"><value>moiseslinares842@gmail.com</value></property>
+        <property name="password"><value>Bgoogle1234</value></property>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtp.quitwait">false</prop>
+                <prop key="mail.smtp.ssl.trust">*</prop>
+            </props>
+        </property>
+	</bean>
 
 	<jaxws:server id="servicioWS"
 		serviceClass="com.sysdt.lock.ws.AperturaWS"
@@ -49,22 +72,21 @@
 		<property name="mapperLocations" value="classpath:com/sysdt/lock/xml/*.xml" />
 	</bean>
 	
-<!-- 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"> -->
-<!-- 		<property name="driverClass" value="com.mysql.jdbc.Driver" /> -->
-<!-- 		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/base_chapa" /> -->
-<!-- 		<property name="user" value="root" /> -->
-<!-- 		<property name="password" value="5438" /> -->
-<!-- 	</bean> -->
-
 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_494512d819a01c5?reconnect=true" />
-		<property name="user" value="b5af500461c6d2" />
-		<property name="password" value="03304419" />
-		<property name="maxPoolSize" value="4" />
-		<property name="idleConnectionTestPeriod" value="55" />
-		<property name="preferredTestQuery" value="SELECT 1" />
-<!-- 		<property name="testOnBorrow" value="true" /> -->
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/base_chapa" />
+		<property name="user" value="root" />
+		<property name="password" value="5438" />
 	</bean>
+
+<!-- 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"> -->
+<!-- 		<property name="driverClass" value="com.mysql.jdbc.Driver" /> -->
+<!-- 		<property name="jdbcUrl" value="jdbc:mysql://us-cdbr-iron-east-04.cleardb.net/heroku_494512d819a01c5?reconnect=true" /> -->
+<!-- 		<property name="user" value="b5af500461c6d2" /> -->
+<!-- 		<property name="password" value="03304419" /> -->
+<!-- 		<property name="maxPoolSize" value="4" /> -->
+<!-- 		<property name="idleConnectionTestPeriod" value="55" /> -->
+<!-- 		<property name="preferredTestQuery" value="SELECT 1" /> -->
+<!-- 	</bean> -->
 
 </beans>

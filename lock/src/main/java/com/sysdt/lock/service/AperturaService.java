@@ -25,7 +25,6 @@ import com.sysdt.lock.dto.SolicitudDTO;
 import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.util.Constantes;
-import com.sysdt.lock.ws.AperturaWS;
 
 @Service
 @Transactional
