@@ -7,6 +7,12 @@ import java.util.TimeZone;
 
 public class Utilerias {
 
+	public static Date fechaLocale(Date date){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
+		cal.setTime(date);
+		return cal.getTime();
+	}
+	
 	public static Date fechaHoyLocale(){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
 		return cal.getTime();

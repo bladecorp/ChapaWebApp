@@ -25,6 +25,7 @@ import com.sysdt.lock.dto.SolicitudDTO;
 import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.util.Constantes;
+import com.sysdt.lock.util.Utilerias;
 
 @Service
 @Transactional
@@ -127,7 +128,7 @@ public class AperturaService{
 				Historico historico = new Historico();
 				historico.setUsername(aperturaDTO.getUsuario());
 				historico.setPlacasEco(aperturaDTO.getEco());
-				historico.setFecha(new Date());
+				historico.setFecha(Utilerias.fechaLocale(new Date()));
 				historico.setEstado(true);
 				historico.setLatitud(solicitud.getLatitud().trim());
 				historico.setLongitud(solicitud.getLongitud().trim());

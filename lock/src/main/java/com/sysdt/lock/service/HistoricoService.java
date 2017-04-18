@@ -3,7 +3,9 @@ package com.sysdt.lock.service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.HistoricoExample;
 import com.sysdt.lock.model.HistoricoExample.Criteria;
 import com.sysdt.lock.util.Constantes;
+import com.sysdt.lock.util.Utilerias;
 
 @Service
 @Transactional
@@ -44,7 +47,7 @@ public class HistoricoService {
 	
 	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer) throws Exception{
 		Historico historico = new Historico();
-		historico.setFecha(new Date());
+		historico.setFecha(Utilerias.fechaLocale(new Date()));
 		historico.setUsername(username);
 		historico.setPlacasEco(placasEco.toUpperCase());
 		historico.setEstado(estado);
@@ -71,7 +74,7 @@ public class HistoricoService {
 	}
 	
 	private Date generarFecha(Date fecha, int tipoFecha){
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
 		cal.setTime(fecha);
 		if(tipoFecha == FECHA_INICIO){
 			cal.set(Calendar.HOUR, 0);
