@@ -79,7 +79,7 @@ public class ClienteService {
 		List<UsuarioEmail> usersEmail = new ArrayList<UsuarioEmail>();
 		UsuarioExample exUser = new UsuarioExample();
 		exUser.createCriteria().andIdClienteEqualTo(idCliente).andEnabledEqualTo(true)
-		.andCaducidadpasswordBetween(Utilerias.fechaHoyLocale(), Utilerias.fechaSumarDias(Constantes.DIAS_FUTURO));
+		.andCaducidadpasswordBetween(Utilerias.fechaHoyLocaleEnCeros(), Utilerias.fechaSumarDias(Constantes.DIAS_FUTURO));
 		List<Usuario> usuarios = usuarioMapper.selectByExample(exUser);
 		for (Usuario usuario : usuarios) {
 			usuario.setPassword("");

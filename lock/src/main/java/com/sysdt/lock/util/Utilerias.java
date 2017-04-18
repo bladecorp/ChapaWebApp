@@ -13,6 +13,14 @@ public class Utilerias {
 		return cal.getTime();
 	}
 	
+	public static Date fechaHoyLocaleEnCeros(){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 3);
+		return cal.getTime();
+	}
+	
 	public static Date fechaHoyLocale(){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
 		return cal.getTime();

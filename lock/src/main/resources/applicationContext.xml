@@ -15,7 +15,8 @@
 
 	<bean id="runScheduler" class="com.sysdt.lock.schedule.ValidarVigenciaPassword" />
 	<task:scheduled-tasks>
-		<task:scheduled ref="runScheduler" method="validarVigencias" cron="0 14 3 ? * *"/>
+<!-- 		<task:scheduled ref="runScheduler" method="validarVigencias" cron="0 3 14 ? * *"/> -->
+		<task:scheduled ref="runScheduler" method="validarVigencias" cron="0 30 4 ? * *"/>
 <!-- 		<task:scheduled ref="runScheduler" method="validarVigencias" cron="*/55 * * * * *"/> -->
 	</task:scheduled-tasks>
 	
