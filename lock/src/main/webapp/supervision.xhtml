@@ -87,7 +87,7 @@
 											</h:selectOneMenu>
 											<p:tooltip for="tipoBusqueda" trackMouse="true" value="Tipo de Búsqueda"  />
 										</div>
-										<div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-12">
+										<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-12">
 											<h:selectOneMenu id="unidades" styleClass="form-control" value="#{superView.eco}" >
 												<f:selectItems value="#{superView.unidades}" var="unit" itemLabel="#{unit.eco}" itemValue="#{unit.eco}" />
 											</h:selectOneMenu>
@@ -105,18 +105,18 @@
 										<div class="form-group col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top:10px;padding:0;">
 											<label for="calIni" style="float:right;">A</label>
 										</div>
-										<div class="form-group col-lg-2  col-md-2 col-sm-2 col-xs-5">
+										<div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-5">
 											<p:calendar id="calFin" value="#{superView.fechaFin}" readonlyInput="true" pattern="dd/MM/yy" style="padding:0;"
 												placeholder="Fin" locale="es" mindate="#{superView.fechaIni}" styleClass="form-control" navigator="true"/>
 <!-- 											<input type="text" placeholder="FIN" class="form-control" /> -->
 										</div>
-										<div class="form-group col-lg-1 col-md-1 col-sm-offset-1 col-sm-5 col-xs-offset-1 col-xs-5">
-											<p:commandButton id="btnBuscar" icon="fa fa-search" styleClass="btn btn-success form-control" style="width:100%;"
+										<div class="form-group col-lg-1 col-md-1 col-sm-2 col-xs-6">
+											<p:commandButton id="btnBuscar" icon="fa fa-search" styleClass="btn btn-success form-control" 
 												action="#{superView.buscarHistorico}" update="form:dtHistorico, form:pnlMapa" 
-												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()" style="width:100%;"/>
 											<p:tooltip for="btnBuscar" trackMouse="true" value="Buscar Registros"  />
 										</div>
-										<div class="form-group col-lg-1 col-md-1 col-sm-5 col-xs-5">
+										<div class="form-group col-lg-1 col-md-1 col-sm-12 col-xs-6">
 											<p:commandLink id="linkReporte" styleClass="btn btn-warning form-control" ajax="false"
 												disabled="#{superView.usuario == null || superView.usuario.username == null}" >
 												<i class="fa fa-bar-chart"></i>
