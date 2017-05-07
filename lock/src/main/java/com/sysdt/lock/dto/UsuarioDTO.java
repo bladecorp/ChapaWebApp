@@ -17,6 +17,14 @@ public class UsuarioDTO implements Serializable{
     private Integer idTipousuario;
     
     private Cliente cliente;
+    
+    private int opcionSel;
+    
+    private String nombre;
+    
+    private String apaterno;
+    
+    private String amaterno;
 
 	public String getUsername() {
 		return username;
@@ -56,6 +64,38 @@ public class UsuarioDTO implements Serializable{
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public int getOpcionSel() {
+		return opcionSel;
+	}
+
+	public void setOpcionSel(int opcionSel) {
+		this.opcionSel = opcionSel;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getApaterno() {
+		return apaterno;
+	}
+
+	public void setApaterno(String apaterno) {
+		this.apaterno = apaterno;
+	}
+
+	public String getAmaterno() {
+		return amaterno;
+	}
+
+	public void setAmaterno(String amaterno) {
+		this.amaterno = amaterno;
 	}
     
     

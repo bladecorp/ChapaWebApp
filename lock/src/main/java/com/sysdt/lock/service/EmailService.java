@@ -25,7 +25,7 @@ public class EmailService {
 	
 	public void insertarEmail(String email, String username){
 		Email email2 = new Email();
-		email2.setDireccion(email.trim());
+		email2.setDireccion(email.trim().toLowerCase());
 		email2.setUsername(username.trim());
 		emailMapper.insert(email2);
 	}

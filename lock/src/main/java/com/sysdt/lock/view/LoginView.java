@@ -1,6 +1,9 @@
 package com.sysdt.lock.view;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -116,15 +119,17 @@ public class LoginView implements Serializable{
 			ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 			Map<String, Object> sessionMap = externalContext.getSessionMap();
 			sessionMap.put("usuario",usuarioDTO);
+			crearCookie(usuarioDTO.getCliente().getNombre());
+			String nomCliente = "?c="+usuarioDTO.getCliente().getNombre();
 			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.ADMINISTRADOR){
-				externalContext.redirect("admin.xhtml");
+				externalContext.redirect("admin.xhtml"+nomCliente);
 			}else if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.SUPERVISOR ||
 							usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.MASTER){
-				externalContext.redirect("supervision.xhtml");
+				externalContext.redirect("supervision.xhtml"+nomCliente);
 			}else if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.OPERADOR){
-				externalContext.redirect("codigos.xhtml");
+				externalContext.redirect("codigos.xhtml"+nomCliente);
 			}else{
-				externalContext.redirect("login.xhtml");
+				externalContext.redirect("login.xhtml"+nomCliente);
 			}
 			
 		}catch(Exception e){
@@ -151,6 +156,15 @@ public class LoginView implements Serializable{
 		cliente.setAncho(320);
 		cliente.setNombre("SYSDT");
 		cliente.setLogo("sysdt.png");
+	}
+	
+	private void crearCookie(String nomCliente) throws UnsupportedEncodingException{
+		String name = Constantes.ClienteCookie.NOMBRE_CLIENTE;
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("maxAge", -1);
+		properties.put("path", "/");
+		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+		externalContext.addResponseCookie(name, URLEncoder.encode(nomCliente, "UTF-8"), properties);
 	}
 
 	public UsuarioService getUsuarioService() {

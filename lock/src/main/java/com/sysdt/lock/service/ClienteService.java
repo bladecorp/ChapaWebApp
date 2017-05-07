@@ -51,6 +51,12 @@ public class ClienteService {
 		cliente.setAncho(320);
 		clienteMapper.insert(cliente);
 	}
+	
+	public void actualizarCliente(Cliente cliente)throws Exception{
+		clienteTrim(cliente);
+		clienteMapper.updateByPrimaryKey(cliente);
+	}
+	
 	private void clienteTrim(Cliente cliente){
 		cliente.setNombre(cliente.getNombre().trim().toUpperCase());
 		cliente.setLogo(cliente.getLogo().trim().toLowerCase());

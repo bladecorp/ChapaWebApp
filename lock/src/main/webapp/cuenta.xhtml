@@ -1,0 +1,267 @@
+<ui:composition template="template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="content">
+
+		<h:form id="form">
+			<p:growl id="growl" autoUpdate="true" showDetail="false" />
+
+			<div class="row">
+
+
+				<!--  FILA 1 COLUMNA 1 -->
+
+				<div class="col-lg-4">
+					<div class="row">
+					<div class="col-lg-12">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">AGREGAR USUARIO</h3>
+							</div>
+							<div class="panel-body">
+							<p:fragment>
+								<p:panelGrid id="pnlAgregarUsuario">
+									<div class="form-horizontal">
+										<div class="form-group">
+											<h:outputLabel value="Usuario"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputUsername" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.usuario.username}" />
+													<span class="input-group-addon"><i class="fa fa-user"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Password"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputPassword" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.usuario.password}" />
+													<span class="input-group-addon"><i class="fa fa-lock"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Nombre"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputNombre" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.usuario.nombre}" />
+													<span class="input-group-addon"><i class="fa fa-user"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Paterno"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputPaterno" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.usuario.apaterno}" />
+													<span class="input-group-addon"><i class="fa fa-user" ></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Materno"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputMaterno" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.usuario.amaterno}" />
+													<span class="input-group-addon"><i class="fa fa-user"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Email"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<div class="input-group">
+													<p:inputText id="inputEmail" styleClass="form-control"
+														style="text-align:center;"
+														value="#{cuentaView.email}" />
+													<span class="input-group-addon"><i class="fa fa-envelope"></i>
+													</span>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<h:outputLabel value="Tipo"
+												styleClass="control-label col-sm-3" />
+											<div class="col-sm-9">
+												<h:selectOneMenu styleClass="form-control"
+													value="#{cuentaView.usuario.idTipousuario}">
+													<f:selectItems value="#{cuentaView.tiposUsuario}" var="tipo"
+														itemLabel="#{tipo.tipo}" itemValue="#{tipo.id}" />
+												</h:selectOneMenu>
+											</div>
+										</div>
+										<div class="form-group" style="margin-top: 35px;">
+											<p:outputLabel styleClass="control-label col-sm-3" />
+											<div class=" col-sm-7">
+												<p:commandButton value="AGREGAR"
+													styleClass="btn btn-primary form-control"
+													action="#{cuentaView.guardarUsuario}" 
+													update="dtUsuarios, inputUsername, inputPassword, inputEmail, inputNombre, inputPaterno, inputMaterno" 
+													onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+											</div>
+										</div>
+
+									</div>
+								</p:panelGrid>
+							</p:fragment>
+							</div>
+						</div>
+						</div>
+					</div>
+					
+				</div>
+
+				<!-- FILA 1 COLUMNA 2 -->
+				<div class="col-lg-5">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<h3 class="panel-title">CUENTAS</h3>
+								</div>
+								<div class="panel-body">
+								<p:fragment>
+									<p:panel styleClass="noBorder">
+										<p:dataTable id="dtUsuarios" paginator="true" rows="9"
+											paginatorTemplate="{PageLinks} {RowsPerPageDropdown}"
+                         					rowsPerPageTemplate="9,15,20"
+											paginatorPosition="bottom" value="#{cuentaView.usuarios}"
+											var="user" reflow="true" selectionMode="single" 
+											selection="#{cuentaView.usuarioSel}" rowKey="#{user.username}">
+											<p:ajax event="rowSelect" listener="#{cuentaView.obtenerCorreos}"
+												update="form:editUsername, form:editPass, form:editEmail, form:editTipo, 
+													form:editEstado, form:editNombre, form:editPaterno, form:editMaterno" 
+												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+											<p:column headerText="Usuario" style="text-align:center;">
+												<h:outputText value="#{user.username}" />
+											</p:column>
+											<p:column headerText="Tipo" style="text-align:center;">
+												<h:outputText
+													value="#{user.idTipousuario==1?'Admin':user.idTipousuario==2?'Supervisor':user.idTipousuario==3?'Operador':'Master'}" />
+											</p:column>
+											<p:column headerText="Estado" style="text-align:center;">
+												<h:outputText value="#{user.enabled?'Activo':'Inactivo'}"
+													style="color:#{user.enabled?'green':'red'}" />
+											</p:column>
+
+										</p:dataTable>
+									</p:panel>
+								</p:fragment>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				<!-- FILA 1 COLUMNA 3 -->
+				<div class="col-lg-3">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<div class="panel-title"> USUARIO </div>
+								</div>
+								<div class="panel-body">
+								<p:fragment>
+									<p:panelGrid id="pnlUserEdit" styleClass="noBorder">
+										<div class="form">
+										
+											<div class="form-group">
+												<h:outputText value="Usuario" />
+												<p:inputText id="editUsername" value="#{cuentaView.usuarioSel.username}" 
+															styleClass="form-control" disabled="true"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Password" />
+												<p:inputText id="editPass" value="#{cuentaView.usuarioSel.password}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Nombre" />
+												<p:inputText id="editNombre" value="#{cuentaView.usuarioSel.nombre}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Paterno" />
+												<p:inputText id="editPaterno" value="#{cuentaView.usuarioSel.apaterno}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Materno" />
+												<p:inputText id="editMaterno" value="#{cuentaView.usuarioSel.amaterno}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Email" />
+												<p:inputText id="editEmail" value="#{cuentaView.emailSel}" styleClass="form-control"/>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Tipo" />
+												<h:selectOneMenu id="editTipo" styleClass="form-control" 
+														value="#{cuentaView.usuarioSel.idTipousuario}">
+													<f:selectItems value="#{cuentaView.tiposUsuario}" var="tipo"
+															itemLabel="#{tipo.tipo}" itemValue="#{tipo.id}" />
+												</h:selectOneMenu>
+											</div>
+											<div class="form-group">
+												<h:outputText value="Estado" />
+												<h:selectOneMenu id="editEstado" styleClass="form-control" 
+														value="#{cuentaView.usuarioSel.enabled}">
+													<f:selectItem itemLabel="Activo" itemValue="true"/>
+													<f:selectItem itemLabel="Inactivo" itemValue="false"/>
+												</h:selectOneMenu>
+											</div>
+											<div class="form-group">
+												<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+													<p:commandButton action="#{cuentaView.eliminarUsuario}" styleClass="btn btn-danger form-control"
+														update="dtUsuarios, form:editUsername, form:editPass, form:editEmail" icon="fa fa-trash"
+														onclick="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()">
+													</p:commandButton>
+												</div>
+												<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+													<p:commandButton value="ACTUALIZAR" action="#{cuentaView.actualizarUsuario}"
+													styleClass="btn btn-success btn-block form-control" 
+													update="dtUsuarios" onclick="PF('statusDialog').show()"  
+													oncomplete="PF('statusDialog').hide()"/>
+												</div>
+											</div>
+										</div>
+					
+									</p:panelGrid>
+									</p:fragment>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div><!-- .FIN COLUMNA 3 -->
+
+			</div>
+			<!-- FIN DEL ROW PRINCIPAL -->
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

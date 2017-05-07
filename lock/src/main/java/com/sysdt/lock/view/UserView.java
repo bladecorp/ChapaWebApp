@@ -1,6 +1,7 @@
 package com.sysdt.lock.view;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -11,11 +12,14 @@ import javax.faces.bean.ViewScoped;
 
 import org.primefaces.context.RequestContext;
 
+import com.sysdt.lock.dto.RelacionesDTO;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Unidad;
+import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.AperturaService;
 import com.sysdt.lock.service.ChoferService;
+import com.sysdt.lock.service.SupervisorEntidadService;
 import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
 import com.sysdt.lock.util.Constantes;
@@ -43,6 +47,9 @@ public class UserView implements Serializable{
 	@ManagedProperty("#{manejoSesionView}")
 	private ManejoSesionView manejoSesionView;
 	
+	@ManagedProperty("#{supervisorEntidadService}")
+	private SupervisorEntidadService supervisorEntidadService;
+	
 	private String clave1;
 	private String clave2;
 	private String codigo;
@@ -51,18 +58,40 @@ public class UserView implements Serializable{
 	private List<Chofer> choferes;
 	private int idUnidad;
 	private int idChofer;
-	
+	private int tipoServicio;
 	
 	@PostConstruct
 	public void init(){
-		usuarioDTO = manejoSesionView.obtenerUsuarioEnSesion();
-		unidades = unidadService.obtenerUnidadesPorIdCliente(usuarioDTO.getIdCliente());
-		if(unidades.isEmpty()){
-			unidades.add(generarUnidadVacia());
-		}
-		choferes = choferService.obtenerChoferesPorIdCliente(usuarioDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO);
-		if(choferes.isEmpty()){
-			choferes.add(generarChoferVacio());
+		if(manejoSesionView.validarPerfiles(Constantes.TipoUsuario.TODOS)){
+			usuarioDTO = manejoSesionView.obtenerUsuarioEnSesion();
+			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.ADMINISTRADOR || usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.MASTER){
+				unidades = unidadService.obtenerUnidadesPorIdCliente(usuarioDTO.getIdCliente(), Constantes.OrderBy.UNIDAD_ECO);
+				choferes = choferService.obtenerChoferesPorIdCliente(usuarioDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO, Constantes.OrderBy.CHOFER_NOMBRE);
+			} else {
+				List<Unidad> units = unidadService.obtenerUnidadesPorIdCliente(usuarioDTO.getIdCliente(),Constantes.OrderBy.UNIDAD_ECO);
+				List<Chofer> chofs = choferService.obtenerChoferesPorIdCliente(usuarioDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO, Constantes.OrderBy.CHOFER_NOMBRE);
+				List<Usuario> ops = new ArrayList<Usuario>();
+				RelacionesDTO relacionInicial = null;
+				if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.SUPERVISOR){
+					relacionInicial = supervisorEntidadService.obtenerRelacionesPorSupervisor(usuarioDTO.getUsername(), usuarioDTO.getIdCliente(), ops, units, chofs);
+				} else{
+					relacionInicial = supervisorEntidadService.obtenerRelacionesPorOperador(usuarioDTO.getUsername(), usuarioDTO.getIdCliente(), units, chofs);
+				}
+				unidades = relacionInicial.getUnidadesRel();
+				choferes = relacionInicial.getChoferesRel();
+			}
+				
+		//	unidades = unidadService.obtenerUnidadesPorIdCliente(usuarioDTO.getIdCliente());
+			if(unidades.isEmpty()){
+				unidades.add(generarUnidadVacia());
+			}
+	//		choferes = choferService.obtenerChoferesPorIdCliente(usuarioDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO);
+			if(choferes.isEmpty()){
+				choferes.add(generarChoferVacio());
+			}
+			if(usuarioDTO.getIdTipousuario() == 1){tipoServicio=1;}else{tipoServicio=2;}
+		}else{
+			manejoSesionView.cerrarSesionUsuario();
 		}
 	}
 	
@@ -90,7 +119,8 @@ public class UserView implements Serializable{
 				codigo = security.convertirLlaves(clave1, clave2, usuarioDTO.getIdCliente());
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
 				if(codigo != null && !codigo.trim().isEmpty()){
-					aperturaService.enviarSolicitudDeApertura(idChofer, chofer.getToken(), unit, usuarioDTO.getUsername(), usuarioDTO.getCliente().getIswialon(), codigo);
+					aperturaService.enviarSolicitudDeApertura(chofer, unit, usuarioDTO.getUsername(), 
+						usuarioDTO.getCliente().getIswialon(), codigo, nombreUsuario(), usuarioDTO.getIdCliente());
 					MensajeGrowl.mostrar("La solicitud de apertura fue enviada, "
 					+ "pero esta sujeta a la cobertura de la compania de telefonia celular", FacesMessage.SEVERITY_INFO);
 				}else{
@@ -172,6 +202,10 @@ public class UserView implements Serializable{
 		chofer.setApaterno("");
 		chofer.setAmaterno("");
 		return chofer;
+	}
+	
+	private String nombreUsuario(){
+		return usuarioDTO.getNombre()+" "+usuarioDTO.getApaterno()+" "+(usuarioDTO.getAmaterno()!=null?usuarioDTO.getAmaterno():"");
 	}
 
 	public UsuarioService getUsuarioService() {
@@ -276,6 +310,23 @@ public class UserView implements Serializable{
 
 	public void setIdChofer(int idChofer) {
 		this.idChofer = idChofer;
+	}
+
+	public SupervisorEntidadService getSupervisorEntidadService() {
+		return supervisorEntidadService;
+	}
+
+	public void setSupervisorEntidadService(
+			SupervisorEntidadService supervisorEntidadService) {
+		this.supervisorEntidadService = supervisorEntidadService;
+	}
+
+	public int getTipoServicio() {
+		return tipoServicio;
+	}
+
+	public void setTipoServicio(int tipoServicio) {
+		this.tipoServicio = tipoServicio;
 	}
 
 	

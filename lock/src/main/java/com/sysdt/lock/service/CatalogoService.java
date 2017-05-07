@@ -10,6 +10,8 @@ import com.sysdt.lock.dao.TipoEventoMapper;
 import com.sysdt.lock.dao.TipoUsuarioMapper;
 import com.sysdt.lock.model.TipoEvento;
 import com.sysdt.lock.model.TipoUsuario;
+import com.sysdt.lock.model.TipoUsuarioExample;
+import com.sysdt.lock.util.Constantes;
 
 @Service
 @Transactional
@@ -23,6 +25,13 @@ public class CatalogoService {
 	
 	public List<TipoUsuario> obtenerTiposUsuario(){
 		return tipoUsuarioMapper.selectByExample(null);
+	}
+	
+	public List<TipoUsuario> obtenerTiposUsuarioSinAdmin(){
+		TipoUsuarioExample exTU = new TipoUsuarioExample();
+		exTU.createCriteria().andIdNotEqualTo(Constantes.TipoUsuario.ADMINISTRADOR)
+		.andIdNotEqualTo(Constantes.TipoUsuario.MASTER);
+		return tipoUsuarioMapper.selectByExample(exTU);
 	}
 	
 	public List<TipoEvento> obtenerTiposEvento(){

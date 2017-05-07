@@ -35,15 +35,24 @@ public class ChoferView implements Serializable{
 	
 	@PostConstruct
 	public void init(){
-		userDTO = manejoSesionView.obtenerUsuarioEnSesion();
-		if(userDTO == null || userDTO.getIdTipousuario() != Constantes.TipoUsuario.ADMINISTRADOR){
+		if(manejoSesionView.validarPerfiles(Constantes.TipoUsuario.ADMINISTRADOR, Constantes.TipoUsuario.MASTER)){
+			userDTO = manejoSesionView.obtenerUsuarioEnSesion();
+			estado = 1;
+			chofer = new Chofer();
+			choferSel = new Chofer();
+			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO, Constantes.OrderBy.CHOFER_NOMBRE);
+		} else{
+			manejoSesionView.cerrarSesionUsuario();
+		}
+/*		userDTO = manejoSesionView.obtenerUsuarioEnSesion();
+		if(userDTO == null || userDTO.getUsername() == null ||  userDTO.getIdTipousuario() != Constantes.TipoUsuario.ADMINISTRADOR){
 			manejoSesionView.cerrarSesionUsuario();
 		}else{
 			estado = 1;
 			chofer = new Chofer();
 			choferSel = new Chofer();
 			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(), true, Constantes.EstadoChofer.ACTIVO);
-		}
+		} */
 	}
 	
 	public void guardarNuevoChofer(){
@@ -79,10 +88,10 @@ public class ChoferView implements Serializable{
 	
 	public void recargarTabla(){
 		if(estado == Constantes.EstadoChofer.TODOS){
-			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(),false, false);
+			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(),false, false, Constantes.OrderBy.CHOFER_NOMBRE);
 		}else{
 			boolean nuevoEstado = estado == 1;
-			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(), true, nuevoEstado);
+			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(), true, nuevoEstado, Constantes.OrderBy.CHOFER_NOMBRE);
 		}
 		if(chofer != null){
 			chofer.setId(0);

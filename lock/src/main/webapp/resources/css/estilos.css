@@ -186,3 +186,11 @@ background: linear-gradient(to left, #c0c1c1, #f1f1f1); /* W3C, IE 10+/ Edge, Fi
 			background:black !important;
 			opacity:0.10 !important;
 		}
+.ui-chkbox-box{
+	background:#a9a7a7 !important;
+}
+
+.opcionSel {
+	background:#777777;
+	color:white;
+}

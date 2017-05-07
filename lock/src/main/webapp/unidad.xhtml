@@ -1,0 +1,139 @@
+<ui:composition template="template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="content">
+
+		<h:form id="form">
+			<p:growl id="growl" autoUpdate="true" showDetail="false" />
+
+			<div class="row">
+
+
+				<!--  FILA 1 COLUMNA 1 -->
+
+				<div class="col-lg-5 col-md-5">
+
+					<!-- FILA 3 COLUMNA 1 -->
+<!-- 					<div class="row"> -->
+<!-- 						<div class="col-lg-12"> -->
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<h3 class="panel-title">UNIDAD</h3>
+								</div>
+								<div class="panel-body">
+									<p:fragment>
+										<p:panelGrid id="pnlAgregarUnidad">
+											<div class="form-horizontal">
+												<div class="form-group">
+													<h:outputLabel value="Eco"
+														styleClass="control-label col-sm-3" />
+													<div class="col-sm-9">
+														<div class="input-group" style="width: 100%;">
+															<p:inputText id="inputUnidad" styleClass="form-control"
+																style="text-align:center;" value="#{unidadView.unidad.eco}" />
+															<span class="input-group-addon"><i
+																class="fa fa-truck"></i> </span>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<h:outputLabel value="Serie"
+														styleClass="control-label col-sm-3" />
+													<div class="col-sm-9">
+														<div class="input-group" style="width: 100%;">
+															<p:inputText id="inputSerie" styleClass="form-control"
+																style="text-align:center;" value="#{unidadView.unidad.serie}" />
+															<span class="input-group-addon"><i
+																class="fa fa-truck"></i> </span>
+														</div>
+													</div>
+												</div>
+												<div class="form-group" style="margin-top: 35px;">
+													<div class="col-md-2 col-sm-2 col-xs-2">
+														<p:commandButton
+															update="inputUnidad, inputSerie, dtUnidades"
+															action="#{unidadView.eliminarUnidad}"
+															styleClass="btn btn-danger form-control"
+															icon="fa fa-trash" onclick="PF('statusDialog').show()"
+															oncomplete="PF('statusDialog').hide()" />
+													</div>
+													<div class="col-md-5 col-sm-5 col-xs-5">
+														<p:commandButton value="ACTUALIZAR"
+															update="inputUnidad, inputSerie, dtUnidades"
+															styleClass="btn btn-primary form-control"
+															action="#{unidadView.actualizarUnidad}"
+															onclick="PF('statusDialog').show()"
+															oncomplete="PF('statusDialog').hide()" />
+													</div>
+													<div class="col-md-5 col-sm-5 col-xs-5">
+														<p:commandButton value="NUEVO"
+															update="inputUnidad, inputSerie, dtUnidades"
+															styleClass="btn btn-success form-control"
+															action="#{unidadView.guardarUnidad}"
+															onclick="PF('statusDialog').show()"
+															oncomplete="PF('statusDialog').hide()" />
+													</div>
+												</div>
+											</div>
+										</p:panelGrid>
+									</p:fragment>
+								</div>
+							</div>
+<!-- 						</div> -->
+<!-- 					</div> -->
+
+				</div>
+				
+				<!-- FILA 1 COLUMNA 2 -->
+				<div class="col-lg-7 col-md-7">
+<!-- 					<div class="row"> -->
+<!-- 						<div class="col-lg-12"> -->
+							<div class="panel panel-primary">
+								<div class="panel-heading">
+									<h3 class="panel-title">UNIDADES</h3>
+								</div>
+								<div class="panel-body">
+								<p:fragment>
+									<p:panel styleClass="noBorder">
+										<div class="form-horizontal">
+										</div>
+										<p:dataTable id="dtUnidades" paginator="true" rows="9"
+											paginatorTemplate="{PageLinks} {RowsPerPageDropdown}"
+                         					rowsPerPageTemplate="9,15,20"
+											paginatorPosition="bottom" value="#{unidadView.unidades}"
+											var="unit" reflow="true" selectionMode="single" 
+											selection="#{unidadView.unidad}" rowKey="#{unit.id}">
+											<p:ajax event="rowSelect" 
+												update="form:inputUnidad, form:inputSerie" 
+												onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
+											<p:column headerText="Id" style="text-align:center;">
+												<h:outputText value="#{unit.id}" />
+											</p:column>
+											<p:column headerText="Unidad" style="text-align:center;">
+												<h:outputText value="#{unit.eco}" />
+											</p:column>
+											<p:column headerText="Serie" style="text-align:center;">
+												<h:outputText value="#{unit.serie}" />
+											</p:column>
+
+										</p:dataTable>
+									</p:panel>
+								</p:fragment>
+								</div>
+							</div>
+<!-- 						</div> -->
+<!-- 					</div> -->
+				</div>
+
+
+			</div>
+			<!-- FIN DEL ROW PRINCIPAL -->
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

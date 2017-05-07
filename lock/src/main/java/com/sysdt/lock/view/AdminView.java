@@ -10,6 +10,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import org.springframework.beans.BeanUtils;
+
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Cliente;
 import com.sysdt.lock.model.Email;
@@ -18,7 +20,6 @@ import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.CatalogoService;
 import com.sysdt.lock.service.ClienteService;
-import com.sysdt.lock.service.DependenciaService;
 import com.sysdt.lock.service.EmailService;
 import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
@@ -38,8 +39,6 @@ public class AdminView implements Serializable {
 	private UsuarioService usuarioService;
 	@ManagedProperty("#{catalogoService}")
 	private CatalogoService catalogoService;
-	@ManagedProperty("#{dependenciaService}")
-	private DependenciaService dependenciaService;
 	@ManagedProperty("#{unidadService}")
 	private UnidadService unidadService;
 	@ManagedProperty("#{emailService}")
@@ -50,12 +49,10 @@ public class AdminView implements Serializable {
 	private List<Cliente> clientes;
 	private List<TipoUsuario> tiposUsuario;
 	private List<Usuario> usuarios;
-	private Cliente cliente;
+//	private Cliente cliente;
+	private int idClienteTemp;
+	private Cliente clienteAct;
 	private int idCliente;
-	private List<Unidad> unidades;
-	private int unidadSel;
-	private String eco;
-	private String serie;
 	private Usuario usuario;
 	private Usuario usuarioSel;
 	private int clienteSel;
@@ -64,32 +61,27 @@ public class AdminView implements Serializable {
 	private String email;
 	private String emailSel;
 	
-	//SECCION ASOCIADOS
-	private String nuevoAsociado;
-	private String asociado;
-	private List<String> listaAsociados;
-	private List<String> posiblesAsociados;
-	private boolean disableAsociado;
-	
 	@PostConstruct
 	public void init(){
-		UsuarioDTO userDTO = manejoSesionView.obtenerUsuarioEnSesion();
-		if(userDTO == null || userDTO.getIdTipousuario() != Constantes.TipoUsuario.ADMINISTRADOR){
-			manejoSesionView.cerrarSesionUsuario();
-		}else{
-			cliente = new Cliente();
+		UsuarioDTO userDTO = null;
+		if(manejoSesionView.validarPerfiles(Constantes.TipoUsuario.ADMINISTRADOR)){
+			userDTO = manejoSesionView.obtenerUsuarioEnSesion();
 			usuario = new Usuario();
 			resetUsuarioSel();
 			clientes = clienteService.obtenerClientes();
 			tiposUsuario = catalogoService.obtenerTiposUsuario();
 			clienteSel = clientes.get(0).getId();
 			usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
-			disableAsociado = true;
-			posiblesAsociados = new ArrayList<String>();
-			listaAsociados = new ArrayList<String>();
-			unidades = new ArrayList<Unidad>();
 			idCliente = clientes.size() > 0 ? clientes.get(0).getId():0;
-			cargarUnidadesDelCliente();
+			clienteAct = new Cliente();
+			BeanUtils.copyProperties(clientes.get(0), clienteAct);
+//		}
+	//	UsuarioDTO userDTO = manejoSesionView.obtenerUsuarioEnSesion();
+//		if(userDTO == null || userDTO.getUsername() == null ||  userDTO.getIdTipousuario() != Constantes.TipoUsuario.ADMINISTRADOR){
+//			manejoSesionView.cerrarSesionUsuario();
+		}else{
+	//		cliente = new Cliente();
+			manejoSesionView.cerrarSesionUsuario();
 		}
 	}
 	
@@ -113,14 +105,28 @@ public class AdminView implements Serializable {
 	}
 
 	public void guardarCliente(){
-		if(validarCliente()){
+		if(validarClienteAct()){
 			try {
-				clienteService.insertarCliente(cliente);
+				clienteAct.setId(0);
+				clienteService.insertarCliente(clienteAct);
 				clientes = clienteService.obtenerClientes();
-				cliente = new Cliente();
+//				cliente = new Cliente();
 				MensajeGrowl.mostrar("El cliente se guardó exitosamente", FacesMessage.SEVERITY_INFO);;
 			} catch (Exception e) {
 				MensajeGrowl.mostrar("Error al guardar cliente", FacesMessage.SEVERITY_FATAL);
+			}
+		}
+	}
+	
+	public void actualizarCliente(){
+		if(validarClienteAct()){
+			try {
+				clienteService.actualizarCliente(clienteAct);
+				clientes = clienteService.obtenerClientes();
+			//	BeanUtils.copyProperties(clientes.get(0),clienteAct);
+				MensajeGrowl.mostrar("El cliente se actualizó exitosamente", FacesMessage.SEVERITY_INFO);;
+			} catch (Exception e) {
+				MensajeGrowl.mostrar("Error al actualizar cliente", FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}
@@ -140,7 +146,7 @@ public class AdminView implements Serializable {
 	public void eliminarUsuario(){
 		if(validarUsuarioSel()){
 			try {
-				usuarioService.eliminarUsuarioPorId(usuarioSel.getUsername());
+				usuarioService.eliminarUsuarioCompletoPorUsernameYidCliente(usuarioSel.getUsername(), usuarioSel.getIdCliente());
 				usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
 				resetUsuarioSel();
 				MensajeGrowl.mostrar("Usuario eliminado exitosamente", FacesMessage.SEVERITY_INFO);
@@ -162,12 +168,23 @@ public class AdminView implements Serializable {
 		}
 	}
 	
+	public void obtenerCorreos(){
+		List<Email> correos = emailService.obtenerCorreosPorUsername(usuarioSel.getUsername());
+		emailSel = correos.size() > 0 ? correos.get(0).getDireccion() : "";
+	}
+	
 	public void cambioCliente(){
 		usuarios = usuarioService.obtenerUsuariosPorIdCliente(clienteSel);
 		resetUsuarioSel();
-		listaAsociados.clear();
-		posiblesAsociados.clear();
-		disableAsociado = true;
+	}
+	
+	public void cambioClienteAct(){
+		for(Cliente cl : clientes){
+			if(idClienteTemp == cl.getId()){
+				BeanUtils.copyProperties(cl, clienteAct);
+				break;
+			}
+		}
 	}
 	
 	public boolean validarUsuario(){
@@ -178,6 +195,17 @@ public class AdminView implements Serializable {
 		if(usuario.getPassword().trim().isEmpty()){
 			MensajeGrowl.mostrar("Debe indicar el password", FacesMessage.SEVERITY_ERROR);
 			return false;
+		}
+		if(usuario.getNombre().trim().isEmpty()){
+			MensajeGrowl.mostrar("Debe indicar el nombre", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(usuario.getApaterno().trim().isEmpty()){
+			MensajeGrowl.mostrar("Debe indicar el apellido paterno", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(usuario.getAmaterno().trim().isEmpty()){
+			usuario.setAmaterno("");
 		}
 		if(usuario.getIdCliente() == null){
 			MensajeGrowl.mostrar("Debe indicar el cliente", FacesMessage.SEVERITY_ERROR);
@@ -207,6 +235,17 @@ public class AdminView implements Serializable {
 			MensajeGrowl.mostrar("Debe indicar el password", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
+		if(usuario.getNombre().trim().isEmpty()){
+			MensajeGrowl.mostrar("Debe indicar el nombre", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(usuario.getApaterno().trim().isEmpty()){
+			MensajeGrowl.mostrar("Debe indicar el apellido paterno", FacesMessage.SEVERITY_ERROR);
+			return false;
+		}
+		if(usuario.getAmaterno().trim().isEmpty()){
+			usuario.setAmaterno("");
+		}
 		if(!emailSel.trim().isEmpty() && !Constantes.EMAIL_VALIDATOR.matcher(emailSel.trim()).matches()){
 			MensajeGrowl.mostrar("El email es inválido", FacesMessage.SEVERITY_ERROR);
 			return false;
@@ -218,58 +257,8 @@ public class AdminView implements Serializable {
 		return true;
 	}
 	
-	public void agregarAsociado(){
-		String nuevoAs = nuevoAsociado;
-		boolean repetido = false;
-		for(String aso : listaAsociados){
-			if(aso.contentEquals(nuevoAs)){
-				repetido = true;
-				break;
-			}
-		}
-		if(!repetido){
-			listaAsociados.add(nuevoAs);
-		}else{
-			MensajeGrowl.mostrar("El asociado ya se encuentra en la lista", FacesMessage.SEVERITY_ERROR);
-		}
-		
-	}
-	
-	public void eliminarAsociado(){
-		for(String as : listaAsociados){
-			if(asociado.contentEquals(as)){
-				listaAsociados.remove(as);
-				break;
-			}
-		}
-	}
-	
-	public void guardarListaAsociados(){
-		try {
-			dependenciaService.guardarDependencias(listaAsociados, usuarioSel.getUsername(), usuarioSel.getIdTipousuario());
-			MensajeGrowl.mostrar("Asociados guardados correctamente", FacesMessage.SEVERITY_INFO);
-		} catch (Exception e) {
-			MensajeGrowl.mostrar("Ocurrió una excepcion al guardar asociados", FacesMessage.SEVERITY_FATAL);
-		}
-	}
-	
-	public void obtenerDependientes(){
-		List<Email> correos = emailService.obtenerCorreosPorUsername(usuarioSel.getUsername());
-		emailSel = correos.size() > 0 ? correos.get(0).getDireccion() : "";
-		if(usuarioSel.getIdTipousuario() == Constantes.TipoUsuario.OPERADOR || 
-				usuarioSel.getIdTipousuario() == Constantes.TipoUsuario.SUPERVISOR){
-			disableAsociado = false;
-			posiblesAsociados = usuarioService.obtenerListaDependientesPorTipo(clienteSel, usuarioSel.getIdTipousuario());
-			listaAsociados = dependenciaService.obtenerDependenciasPorUsuario(usuarioSel.getUsername(), usuarioSel.getIdTipousuario());
-		}else{
-			disableAsociado = true;
-			posiblesAsociados.clear();
-			listaAsociados.clear();
-		}
-	}
-	
-	private boolean validarCliente(){
-		if(cliente.getNombre().trim().isEmpty() || cliente.getLogo().trim().isEmpty()){
+	private boolean validarClienteAct(){
+		if(clienteAct.getNombre().trim().isEmpty() || clienteAct.getLogo().trim().isEmpty()){
 			MensajeGrowl.mostrar("Debe escribir el nombre del cliente y de la imagen", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
@@ -280,127 +269,38 @@ public class AdminView implements Serializable {
 		usuarioSel = new Usuario();
 		usuarioSel.setUsername("");
 		usuarioSel.setPassword("");
+		usuarioSel.setNombre("");
+		usuarioSel.setApaterno("");
+		usuarioSel.setAmaterno("");
 		emailSel = "";
 	}
 	
-	public void guardarUnidad(){
-		if(idCliente == 0){
-			MensajeGrowl.mostrar("Debe seleccionar un cliente", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		if(eco == null || eco.trim().isEmpty()){
-			MensajeGrowl.mostrar("Debe escribir el número económico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		Unidad unidad = new Unidad();
-		unidad.setId(0);
-		unidad.setEco(eco);
-		unidad.setSerie(serie != null ? serie.trim() : "");
-		unidad.setIdcliente(idCliente);
-		try{
-			unidadService.guardarNuevaUnidad(unidad);
-			cargarUnidadesDelCliente();
-			MensajeGrowl.mostrar("La unidad fue agregada exitosamente", FacesMessage.SEVERITY_INFO);
-		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrió un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
+	public void sumarCantidad(int tipoMax){
+		if(tipoMax == Constantes.TipoMax.MAX_OPERADORES){
+			clienteAct.setMaxoperadores(clienteAct.getMaxoperadores() + 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_SUPERVISORES){
+			clienteAct.setMaxsupervisores(clienteAct.getMaxsupervisores() + 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_CHOFERES){
+			clienteAct.setMaxchoferes(clienteAct.getMaxchoferes() + 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_UNIDADES){
+			clienteAct.setMaxunidades(clienteAct.getMaxunidades() + 1);
 		}
 	}
 	
-	public void actualizarUnidad(){
-		if(idCliente == 0){
-			MensajeGrowl.mostrar("Debe seleccionar un cliente", FacesMessage.SEVERITY_WARN);
-			return;
+	public void restarCantidad(int tipoMax){
+		if(tipoMax == Constantes.TipoMax.MAX_OPERADORES){
+			if(clienteAct.getMaxoperadores() > 0)
+				clienteAct.setMaxoperadores(clienteAct.getMaxoperadores() - 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_SUPERVISORES){
+			if(clienteAct.getMaxsupervisores() > 0)
+				clienteAct.setMaxsupervisores(clienteAct.getMaxsupervisores() - 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_CHOFERES){
+			if(clienteAct.getMaxchoferes() > 0)
+				clienteAct.setMaxchoferes(clienteAct.getMaxchoferes() - 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_UNIDADES){
+			if(clienteAct.getMaxunidades() > 0)
+				clienteAct.setMaxunidades(clienteAct.getMaxunidades() - 1);
 		}
-		if(unidadSel == 0){
-			MensajeGrowl.mostrar("Debe seleccionar una unidad", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		if(unidadSel == Constantes.LISTA_UNIDADES_VACIA){
-			MensajeGrowl.mostrar("No hay unidades vinculadas a la cuenta", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		if(eco == null || eco.trim().isEmpty()){
-			MensajeGrowl.mostrar("Debe escribir el nuevo número económico o las placas de la unidad", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		
-		try{
-			Unidad unidad = new Unidad();
-			unidad.setId(unidadSel);
-			unidad.setEco(eco.trim());
-			unidad.setSerie(serie != null ? serie.trim() : "");
-			unidad.setIdcliente(idCliente);
-			
-			boolean exito = unidadService.actualizarUnidad(unidad);
-			if(exito){
-				cargarUnidadesDelCliente();
-				MensajeGrowl.mostrar("La unidad fue actualizada exitosamente", FacesMessage.SEVERITY_INFO);
-			}else{
-				MensajeGrowl.mostrar("No se pudo actualizar porque no se encontró el registro de la unidad", FacesMessage.SEVERITY_ERROR);
-			}
-			
-		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrió un error al guardar la unidad", FacesMessage.SEVERITY_FATAL);
-		}
-		
-	}
-	
-	public void eliminarUnidad(){
-		if(unidadSel == 0){
-			MensajeGrowl.mostrar("Debe seleccionar una unidad", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		if(unidadSel == Constantes.LISTA_UNIDADES_VACIA){
-			MensajeGrowl.mostrar("No hay unidades vinculadas a la cuenta", FacesMessage.SEVERITY_WARN);
-			return;
-		}
-		try{
-			boolean exito = unidadService.eliminarUnidad(unidadSel);
-			if(exito){
-				cargarUnidadesDelCliente();
-				MensajeGrowl.mostrar("La unidad fue eliminada exitosamente", FacesMessage.SEVERITY_INFO);
-			}else{
-				MensajeGrowl.mostrar("No se pudo eliminar porque no se encontró el registro de la unidad", FacesMessage.SEVERITY_FATAL);
-			}
-		}catch(Exception e){
-			MensajeGrowl.mostrar("Ocurrió un error al eliminar la unidad", FacesMessage.SEVERITY_FATAL);
-		}
-	}
-	
-	public void cargarUnidadesDelCliente(){
-		unidades.clear();
-		eco = "";
-		serie = "";
-		if(idCliente != 0){
-			unidades = unidadService.obtenerUnidadesPorIdCliente(idCliente);
-			if(unidades.isEmpty()){
-				unidades.add(generarUnidadVacia());
-			}else{
-				eco = unidades.get(0).getEco();
-				serie = unidades.get(0).getSerie();
-			}
-		}
-	}
-	
-	public void cambioUnidad(){
-		eco = "";
-		serie = "";
-		if(unidadSel != Constantes.LISTA_UNIDADES_VACIA){
-			for(Unidad unidad : unidades){
-				if(unidadSel == unidad.getId()){
-					eco = unidad.getEco();
-					serie = unidad.getSerie();
-					break;
-				}
-			}
-		}
-	}
-	
-	private Unidad generarUnidadVacia(){
-		Unidad unidad = new Unidad();
-		unidad.setId(Constantes.LISTA_UNIDADES_VACIA);
-		unidad.setEco("No hay unidades disponibles");
-		return unidad;
 	}
 	
 	private Cliente buscarClientePorId(int idCliente){
@@ -460,14 +360,6 @@ public class AdminView implements Serializable {
 		this.tiposUsuario = tiposUsuario;
 	}
 
-	public Cliente getCliente() {
-		return cliente;
-	}
-
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
-
 	public Usuario getUsuario() {
 		return usuario;
 	}
@@ -500,53 +392,6 @@ public class AdminView implements Serializable {
 		this.usuarioSel = usuarioSel;
 	}
 
-	public DependenciaService getDependenciaService() {
-		return dependenciaService;
-	}
-
-	public void setDependenciaService(DependenciaService dependenciaService) {
-		this.dependenciaService = dependenciaService;
-	}
-
-	public String getNuevoAsociado() {
-		return nuevoAsociado;
-	}
-
-	public void setNuevoAsociado(String nuevoAsociado) {
-		this.nuevoAsociado = nuevoAsociado;
-	}
-
-	public List<String> getListaAsociados() {
-		return listaAsociados;
-	}
-
-	public void setListaAsociados(List<String> listaAsociados) {
-		this.listaAsociados = listaAsociados;
-	}
-
-	public List<String> getPosiblesAsociados() {
-		return posiblesAsociados;
-	}
-
-	public void setPosiblesAsociados(List<String> posiblesAsociados) {
-		this.posiblesAsociados = posiblesAsociados;
-	}
-
-	public String getAsociado() {
-		return asociado;
-	}
-
-	public void setAsociado(String asociado) {
-		this.asociado = asociado;
-	}
-
-	public boolean isDisableAsociado() {
-		return disableAsociado;
-	}
-
-	public void setDisableAsociado(boolean disableAsociado) {
-		this.disableAsociado = disableAsociado;
-	}
 
 	public UnidadService getUnidadService() {
 		return unidadService;
@@ -556,44 +401,12 @@ public class AdminView implements Serializable {
 		this.unidadService = unidadService;
 	}
 
-	public List<Unidad> getUnidades() {
-		return unidades;
-	}
-
-	public void setUnidades(List<Unidad> unidades) {
-		this.unidades = unidades;
-	}
-
 	public int getIdCliente() {
 		return idCliente;
 	}
 
 	public void setIdCliente(int idCliente) {
 		this.idCliente = idCliente;
-	}
-
-	public int getUnidadSel() {
-		return unidadSel;
-	}
-
-	public void setUnidadSel(int unidadSel) {
-		this.unidadSel = unidadSel;
-	}
-
-	public String getEco() {
-		return eco;
-	}
-
-	public void setEco(String eco) {
-		this.eco = eco;
-	}
-
-	public String getSerie() {
-		return serie;
-	}
-
-	public void setSerie(String serie) {
-		this.serie = serie;
 	}
 
 	public String getEmail() {
@@ -618,6 +431,22 @@ public class AdminView implements Serializable {
 
 	public void setEmailService(EmailService emailService) {
 		this.emailService = emailService;
+	}
+
+	public int getIdClienteTemp() {
+		return idClienteTemp;
+	}
+
+	public void setIdClienteTemp(int idClienteTemp) {
+		this.idClienteTemp = idClienteTemp;
+	}
+
+	public Cliente getClienteAct() {
+		return clienteAct;
+	}
+
+	public void setClienteAct(Cliente clienteAct) {
+		this.clienteAct = clienteAct;
 	}
 	
 

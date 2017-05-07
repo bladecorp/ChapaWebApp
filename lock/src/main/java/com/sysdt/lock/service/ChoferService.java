@@ -1,5 +1,6 @@
 package com.sysdt.lock.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import com.sysdt.lock.dao.ChoferMapper;
 import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.ChoferExample;
 import com.sysdt.lock.model.ChoferExample.Criteria;
+import com.sysdt.lock.model.SupervisorEntidad;
+import com.sysdt.lock.util.Constantes;
 
 @Service
 @Transactional
@@ -20,19 +23,19 @@ public class ChoferService {
 	@Autowired
 	private ChoferMapper choferMapper;
 	
-	public List<Chofer> obtenerChoferesPorIdCliente(int idCliente, boolean buscarPorEstado, boolean estado){
+	public List<Chofer> obtenerChoferesPorIdCliente(int idCliente, boolean buscarPorEstado, boolean estado, String orderBy){
 		ChoferExample exChofer = new ChoferExample();
 		Criteria criteria = exChofer.createCriteria();
 		criteria.andIdclienteEqualTo(idCliente);
 		if(buscarPorEstado){
 			criteria.andEnabledEqualTo(estado);
 		}
-		exChofer.setOrderByClause("nombre ASC");
+		exChofer.setOrderByClause(orderBy);
 		return choferMapper.selectByExample(exChofer);
 	}
 	
 	public Map<Integer,Chofer> obtenerChoferesPorIdClienteComoMapa(int idCliente, boolean buscarPorEstado, boolean estado){
-		List<Chofer> choferes = obtenerChoferesPorIdCliente(idCliente, buscarPorEstado, estado);
+		List<Chofer> choferes = obtenerChoferesPorIdCliente(idCliente, buscarPorEstado, estado, Constantes.OrderBy.CHOFER_NOMBRE);
 		Map<Integer, Chofer> chofs = new HashMap<Integer, Chofer>();
 		for(Chofer chofer : choferes){
 			chofs.put(chofer.getId(), chofer);
@@ -85,6 +88,17 @@ public class ChoferService {
 		chofer.setAmaterno(chofer.getAmaterno().trim().toUpperCase());
 	}
 	
-	
+	public List<Chofer> relacionarChoferes(List<Chofer> choferes, List<SupervisorEntidad> entidades){
+		List<Chofer> choferesRel = new ArrayList<Chofer>();
+		for(SupervisorEntidad entidad : entidades){
+			for(Chofer chofer : choferes){
+				if(chofer.getId() == Integer.parseInt(entidad.getIdentidad() ) ){
+					choferesRel.add(chofer);
+					break;
+				}
+			}
+		}
+		return choferesRel;
+	}
 	
 }

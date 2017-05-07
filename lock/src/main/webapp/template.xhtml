@@ -58,28 +58,64 @@
 							<ul class="nav navbar-nav navbar-right">
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1}">
 									<li>
-										<p:commandLink id="linkAdmin" onclick="PF('statusDialog').show();"
+										<p:commandLink id="linkAdmin" onclick="PF('statusDialog').show();" 
+										style="#{manejoSesionView.usuarioDTO.opcionSel == 3 ? 'background:#777777;color:white;' : ''}"
 											value="Administración" action="#{manejoSesionView.redirigir(3)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
 									<li>
-										<p:commandLink id="linkReportes" onclick="PF('statusDialog').show();"
+										<p:commandLink id="linkReportes" onclick="PF('statusDialog').show();" 
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 2 ? 'background:#777777;color:white;' : ''}"
 											value="Reportes" action="#{manejoSesionView.redirigir(2)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
 									<li>
 										<p:commandLink id="linkCodigos" onclick="PF('statusDialog').show();"
-											value="Generación de Codigo y Apertura Remota"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 1 ? 'background:#777777;color:white;' : ''}"
+											value="Códigos"
 											action="#{manejoSesionView.redirigir(1)}" />
 									</li>
 								</c:if>
 								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1}">
 									<li>
 										<p:commandLink id="linkChoferes" onclick="PF('statusDialog').show();"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 4 ? 'background:#777777;color:white;' : ''}"
 											value="Choferes"
 											action="#{manejoSesionView.redirigir(4)}" />
+									</li>
+								</c:if>
+								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1 or manejoSesionView.usuarioDTO.idTipousuario == 4}">
+									<li>
+										<p:commandLink id="linkCuentas" onclick="PF('statusDialog').show();"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 5 ? 'background:#777777;color:white;' : ''}"
+											value="Cuentas"
+											action="#{manejoSesionView.redirigir(5)}" />
+									</li>
+								</c:if>
+								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1 or manejoSesionView.usuarioDTO.idTipousuario == 4}">
+									<li>
+										<p:commandLink id="linkUnidades" onclick="PF('statusDialog').show();"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 6 ? 'background:#777777;color:white;' : ''}"
+											value="Unidades"
+											action="#{manejoSesionView.redirigir(6)}" />
+									</li>
+								</c:if>
+								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario == 1 or manejoSesionView.usuarioDTO.idTipousuario == 4}">
+									<li>
+										<p:commandLink id="linkMasterSup" onclick="PF('statusDialog').show();"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 7 ? 'background:#777777;color:white;' : ''}"
+											value="Supervisores"
+											action="#{manejoSesionView.redirigir(7)}" />
+									</li>
+								</c:if>
+								<c:if test="#{manejoSesionView.usuarioDTO.idTipousuario != 3}">
+									<li>
+										<p:commandLink id="linkMasterOp" onclick="PF('statusDialog').show();"
+											style="#{manejoSesionView.usuarioDTO.opcionSel == 8 ? 'background:#777777;color:white;' : ''}"
+											value="Operadores"
+											action="#{manejoSesionView.redirigir(8)}" />
 									</li>
 								</c:if>
 								<li >

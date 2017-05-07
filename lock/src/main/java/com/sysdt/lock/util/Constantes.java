@@ -10,6 +10,7 @@ public class Constantes {
 	public static final int DIAS_FUTURO = 3;
 	
 	public class TipoUsuario {
+		public static final int TODOS = -1;
 		public static final int ADMINISTRADOR = 1;
 		public static final int SUPERVISOR = 2;
 		public static final int OPERADOR = 3;
@@ -38,7 +39,42 @@ public class Constantes {
 		public static final int VISTA_SUPERVISION = 2;
 		public static final int VISTA_ADMINISTRACION = 3;
 		public static final int VISTA_CHOFERES = 4;
-		
+		public static final int VISTA_CUENTAS = 5;
+		public static final int VISTA_UNIDADES = 6;
+		public static final int VISTA_SUPERVISORES = 7;
+		public static final int VISTA_OPERADORES = 8;
+	}
+	
+	public class TipoMax{
+		public static final int MAX_OPERADORES = 1;
+		public static final int MAX_SUPERVISORES = 2;
+		public static final int MAX_CHOFERES = 3;
+		public static final int MAX_UNIDADES = 4;
+	}
+	
+	public class TipoEntidad{
+		public static final int SUPERVISOR = 1;
+		public static final int OPERADOR = 2;
+		public static final int UNIDAD = 3;
+		public static final int CHOFER = 4;
+	}
+	
+	public class ClienteCookie{
+		public static final String NOMBRE_CLIENTE = "nomCliente";
+		public static final String ACCESO_REPETIDO = "repetido";
+		public static final String VALOR_ACCESO_REPETIDO = "1";
+	}
+	
+	public class OrderBy{
+		public static final String CHOFER_NOMBRE = "nombre ASC";
+		public static final String UNIDAD_ECO = "eco ASC";
+		public static final String USUARIO_USERNAME = "username ASC";
+		public static final String USUARIO_NOMBRE = "nombre ASC";
+	}
+	
+	public class TipoServicio{
+		public static final int COMPLETO = 1;
+		public static final int BASICO = 2;
 	}
 
 }

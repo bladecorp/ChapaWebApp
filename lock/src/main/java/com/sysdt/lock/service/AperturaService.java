@@ -22,6 +22,7 @@ import com.sysdt.lock.dto.AperturaDTO;
 import com.sysdt.lock.dto.PushBotsDTO;
 import com.sysdt.lock.dto.RespuestaDTO;
 import com.sysdt.lock.dto.SolicitudDTO;
+import com.sysdt.lock.model.Chofer;
 import com.sysdt.lock.model.Historico;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.util.Constantes;
@@ -40,15 +41,15 @@ public class AperturaService{
 	@Autowired
 	private ChoferService choferService;
 	
-	public void enviarSolicitudDeApertura(int idChofer, String token, Unidad unidad, String usuario, boolean isWialon, String codigo)throws Exception{
-		int resp = EnviarHttpPush(token, idChofer, unidad.getSerie());
+	public void enviarSolicitudDeApertura(Chofer chofer, Unidad unidad, String usuario, boolean isWialon, String codigo, String nomUsuario, int idCliente)throws Exception{
+		int resp = EnviarHttpPush(chofer.getToken(), chofer.getId(), unidad.getSerie());
 		if(resp != HttpStatus.SC_OK){
 			throw new Exception("Error al enviar mensaje. HTTP CODE: "+resp);
 		}
-		agregarAperturaAlistaDeEspera(idChofer, unidad.getEco(), unidad.getSerie(), usuario, isWialon, codigo);
+		agregarAperturaAlistaDeEspera(chofer.getId(), unidad.getEco(), unidad.getSerie(), usuario, isWialon, codigo, nomUsuario, chofer.getNombre(), idCliente);
 	}
 	
-	private void agregarAperturaAlistaDeEspera(int idChofer, String eco, String serie, String usuario, boolean isWialon, String codigo)throws Exception{
+	private void agregarAperturaAlistaDeEspera(int idChofer, String eco, String serie, String usuario, boolean isWialon, String codigo, String nomUsuario, String nomChofer, int idCliente)throws Exception{
 		AperturaDTO apertura = new AperturaDTO();
 		apertura.setUsuario(usuario);
 		apertura.setEco(eco);
@@ -56,6 +57,9 @@ public class AperturaService{
 		apertura.setWialon(isWialon);
 		apertura.setCodigo(codigo);
 		apertura.setTiempo(System.currentTimeMillis());
+		apertura.setNomUsuario(nomUsuario);
+		apertura.setNomChofer(nomChofer);
+		apertura.setIdCliente(idCliente);
 		aperturas.put(idChofer, apertura);
 	}
 	
@@ -134,6 +138,8 @@ public class AperturaService{
 				historico.setLongitud(solicitud.getLongitud().trim());
 				historico.setIdtipoevento(Constantes.TipoEvento.APERTURA_CHAPA);
 				historico.setIdchofer(solicitud.getIdChofer());
+				historico.setNomusuario(aperturaDTO.getNomUsuario());
+				historico.setNomchofer(aperturaDTO.getNomChofer());
 				historicoService.insertarHistorico(historico);
 			}
 			

@@ -29,8 +29,10 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Historico;
+import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.HistoricoService;
+import com.sysdt.lock.service.UnidadService;
 import com.sysdt.lock.service.UsuarioService;
 import com.sysdt.lock.util.Constantes;
 import com.sysdt.lock.util.MensajeGrowl;
@@ -47,11 +49,15 @@ public class SuperView implements Serializable{
 	private UsuarioService usuarioService;
 	@ManagedProperty("#{historicoService}")
 	private HistoricoService historicoService;
+	@ManagedProperty("#{unidadService}")
+	private UnidadService unidadService;
 	
 	private List<Usuario> usuarios;
 	private List<Historico> historicos;
 	private Usuario usuario;
 	private UsuarioDTO usuarioDTO;
+	private List<Unidad> unidades;
+	private String eco;
 	
 	private Date fechaIni;
 	private Date fechaFin;
@@ -67,33 +73,46 @@ public class SuperView implements Serializable{
 	private String latitud;
 	private String longitud;
 	
+	private final int BUSQUEDA_POR_CODIGO = 1;
+	private final int BUSQUEDA_POR_APERTURA = 2;
+	private final int BUSQUEDA_POR_UNIDAD = 3;
+	
 	@PostConstruct
 	public void init(){
-		usuarioDTO = manejoSesionView.obtenerUsuarioEnSesion();
-		if(usuarioDTO == null || usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.OPERADOR){
-			manejoSesionView.cerrarSesionUsuario();
-		}else{
+		if(manejoSesionView.validarPerfiles(Constantes.TipoUsuario.ADMINISTRADOR, Constantes.TipoUsuario.MASTER, Constantes.TipoUsuario.SUPERVISOR)){
+			usuarioDTO = manejoSesionView.obtenerUsuarioEnSesion();
 			titulo = "";
 			historicos = new ArrayList<Historico>();
+			unidades = new ArrayList<Unidad>();
 			Calendar cal = Calendar.getInstance();
 			fechaIni = cal.getTime();
 			fechaFin = cal.getTime();
-			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.ADMINISTRADOR || 
-					usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.MASTER){
+			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.ADMINISTRADOR ){
 				usuarios = usuarioService.obtenerUsuariosPorIdClienteSinPass(usuarioDTO.getIdCliente());
-			}else{
-				usuarios = usuarioService.obtenerOperadoresPorSupervisor(usuarioDTO.getUsername());
+			}else if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.MASTER){
+				usuarios = usuarioService.obtenerUsuariosPorIdClienteSinAdmin(usuarioDTO.getIdCliente());
+			}else {
+				usuarios = usuarioService.obtenerOperadoresPorSupervisor(usuarioDTO.getUsername(), usuarioDTO.getIdCliente());
 			}
 			modeloMapa = new DefaultMapModel();
 			establecerMapaInicial();
+		}else{
+			manejoSesionView.cerrarSesionUsuario();
 		}
 		
 	}
 	
 	public void buscarHistorico(){
-		if(usuario == null || usuario.getUsername() == null){
-			MensajeGrowl.mostrar("Primero debe seleccionar una cuenta de usuario", FacesMessage.SEVERITY_ERROR);
-			return;
+		if(tipoBisqueda != BUSQUEDA_POR_UNIDAD){
+			if(usuario == null || usuario.getUsername() == null){
+				MensajeGrowl.mostrar("Debe seleccionar una cuenta de usuario", FacesMessage.SEVERITY_ERROR);
+				return;
+			}
+		}else{
+			if(eco == null || eco.trim().isEmpty()){
+				MensajeGrowl.mostrar("Debe seleccionar una unidad", FacesMessage.SEVERITY_ERROR);
+				return;
+			}
 		}
 		if(fechaIni.after(fechaFin)){
 			MensajeGrowl.mostrar("La fecha final no puede ser anterior a la fecha inicial", FacesMessage.SEVERITY_ERROR);
@@ -101,12 +120,13 @@ public class SuperView implements Serializable{
 		}
 	
 		try{
-			historicos = historicoService.obtenerHistoricoPorUsuarioFechaYTipo(usuario.getIdCliente(),usuario.getUsername(), fechaIni, fechaFin, tipoBisqueda);
+			String username = usuario != null ? (tipoBisqueda != BUSQUEDA_POR_UNIDAD? usuario.getUsername() : ""):"";
+			historicos = historicoService.obtenerHistoricoPorUsuarioFechaYTipo(usuarioDTO.getIdCliente(),username, fechaIni, fechaFin, tipoBisqueda, eco);
 			registros = historicos.size();
 			calcularRegistros();
 			String tituloContenido = nombreArchivo();
-			titulo = "PERIODO "+tituloContenido+" ... TIPO: "+(tipoBisqueda==1?"CODIGOS":tipoBisqueda==2?"APERTURAS":"TODO");
-			tituloReporte = "CODIGOS DEL "+tituloContenido+"_"+usuario.getUsername();
+			titulo = "PERIODO "+tituloContenido+"   TIPO: "+(tipoBisqueda==1?"CODIGOS":tipoBisqueda==2?"APERTURAS":tipoBisqueda==3?"UNIDAD":"TODO");
+			tituloReporte = "CODIGOS DEL "+tituloContenido+"_"+(usuario != null ? usuario.getUsername():eco);
 			if(registros == 0){
 				MensajeGrowl.mostrar("No se encontraron registros en esa fecha", FacesMessage.SEVERITY_WARN);
 			}
@@ -157,6 +177,18 @@ public class SuperView implements Serializable{
 			}else{
 				codigosError += 1;
 			}
+		}
+	}
+	
+	public void cambioOpcionBusqueda(){
+		if(tipoBisqueda == BUSQUEDA_POR_UNIDAD){
+			if(usuarioDTO.getIdTipousuario() == Constantes.TipoUsuario.SUPERVISOR){
+				unidades = unidadService.obtenerUnidadesPorSupervisor(usuarioDTO.getUsername(), usuarioDTO.getIdCliente());
+			}else{
+				unidades = unidadService.obtenerUnidadesPorIdCliente(usuarioDTO.getIdCliente(), Constantes.OrderBy.UNIDAD_ECO);
+			}
+		}else{
+			unidades.clear();
 		}
 	}
 	
@@ -367,6 +399,30 @@ public class SuperView implements Serializable{
 
 	public void setHistoricoSel(Historico historicoSel) {
 		this.historicoSel = historicoSel;
+	}
+
+	public List<Unidad> getUnidades() {
+		return unidades;
+	}
+
+	public void setUnidades(List<Unidad> unidades) {
+		this.unidades = unidades;
+	}
+
+	public String getEco() {
+		return eco;
+	}
+
+	public void setEco(String eco) {
+		this.eco = eco;
+	}
+
+	public UnidadService getUnidadService() {
+		return unidadService;
+	}
+
+	public void setUnidadService(UnidadService unidadService) {
+		this.unidadService = unidadService;
 	}
 
 

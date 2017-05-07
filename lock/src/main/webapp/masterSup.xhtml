@@ -1,0 +1,154 @@
+<ui:composition template="template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="content">
+
+		<h:form id="form">
+			<p:growl id="growl" autoUpdate="true" showDetail="false" />
+
+			<!-- FILA 1  -->
+			<div class="row">
+				<div class="col-sm-offset-3 col-sm-6 col-xs-12">
+					<p:panelGrid id="pnlSupervisores">
+						<div class="form-horizontal">
+							<div class="form-group">
+								<h:outputLabel value="Supervisores"
+									styleClass="control-label col-sm-3" />
+								<div class="col-sm-9">
+									<div class="input-group" style="width: 100%;">
+										<h:selectOneMenu id="slctSupervisor" styleClass="form-control" 
+											value="#{masterSupView.usernameSupervisor}">
+											<p:ajax event="change" update="form:dtOperadores, form:dtUnidades, form:dtChoferes, form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof"
+												listener="#{masterSupView.cambioSupervisor}" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" />
+											<f:selectItems value="#{masterSupView.supervisores}"
+												var="sup" itemLabel="#{sup.nombre} #{sup.apaterno} #{sup.amaterno}"
+												itemValue="#{sup.username}" />
+										</h:selectOneMenu>
+									</div>
+								</div>
+							</div>
+
+
+						</div>
+					</p:panelGrid>
+				</div>
+			</div>
+
+			<!-- FILA 2 -->
+			<div class="row">
+				<!-- FILA 2 COLUMNA 1 -->
+				<div class="col-md-4 col-sm-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="height:25px;">OPERADORES
+								<p:commandButton id="btnGuardarOp" styleClass="btn btn-success" icon="fa fa-save" 
+								style="float:right;" value="Guardar" disabled="#{!masterSupView.hayCambiosEnOperadores}"
+								action="#{masterSupView.guardarOperadores}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof"
+								onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"  />
+							</h3>
+						</div>
+						<div class="panel-body">
+							<p:fragment>
+								<p:panelGrid id="pnlOperadores" columns="1" styleClass="cmStyle" >
+									<p:dataTable id="dtOperadores" paginator="false"  value="#{masterSupView.operadores}"
+											var="op" reflow="true" rowSelectMode="checkbox" resizableColumns="true"
+											selection="#{masterSupView.operadoresSel}" rowKey="#{op.username}" style="margin-bottom:0">
+											<p:ajax event="rowSelectCheckbox" listener="#{masterSupView.activarCambio(1)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:ajax event="rowUnselectCheckbox" listener="#{masterSupView.activarCambio(1)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:column selectionMode="multiple" style="text-align:center;" width="50"/>
+											<p:column headerText="Nombre" style="text-align:center;">
+												<h:outputText value="#{op.nombre}" />
+											</p:column>
+											<p:column headerText="Paterno" style="text-align:center;">
+												<h:outputText value="#{op.apaterno}" />
+											</p:column>
+										</p:dataTable>
+								</p:panelGrid>
+							</p:fragment>
+						</div>
+					</div>
+
+				</div>
+				
+				<!-- FILA 2 COLUMNA 2 -->
+				<div class="col-md-4 col-sm-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="height:25px;">UNIDADES
+								<p:commandButton id="btnGuardarUnit" styleClass="btn btn-success" icon="fa fa-save" 
+								style="float:right;" value="Guardar" disabled="#{!masterSupView.hayCambiosEnUnidades}"
+								action="#{masterSupView.guardarUnidades}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof"
+								onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+							</h3>
+						</div>
+						<div class="panel-body">
+							<p:fragment>
+								<p:panelGrid id="pnlUnidades" columns="1" styleClass="cmStyle" >
+									<p:dataTable id="dtUnidades" paginator="false"  value="#{masterSupView.unidades}"
+											var="unit" reflow="true" rowSelectMode="checkbox" resizableColumns="true"
+											selection="#{masterSupView.unidadesSel}" rowKey="#{unit.id}" style="margin-bottom:0">
+											<p:ajax event="rowSelectCheckbox" listener="#{masterSupView.activarCambio(2)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:ajax event="rowUnselectCheckbox" listener="#{masterSupView.activarCambio(2)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:column selectionMode="multiple" style="text-align:center;" width="50"/>
+<!-- 											<p:column headerText="ID" style="text-align:center;"> -->
+<!-- 												<h:outputText value="#{unit.id}" /> -->
+<!-- 											</p:column> -->
+											<p:column headerText="Eco" style="text-align:center;">
+												<h:outputText value="#{unit.eco}" />
+											</p:column>
+											<p:column headerText="Serie" style="text-align:center;">
+												<h:outputText value="#{unit.serie}" />
+											</p:column>
+										</p:dataTable>
+								</p:panelGrid>
+							</p:fragment>
+						</div>
+					</div>
+
+				</div>
+				
+				<!-- FILA 2 COLUMNA 3 -->
+				<div class="col-md-4 col-sm-12">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title" style="height:25px;">CHOFERES
+								<p:commandButton id="btnGuardarChof" styleClass="btn btn-success" icon="fa fa-save" 
+								style="float:right;" value="Guardar" disabled="#{!masterSupView.hayCambiosEnChoferes}"
+								action="#{masterSupView.guardarChoferes}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof"
+								onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+							</h3>
+						</div>
+						<div class="panel-body">
+							<p:fragment>
+								<p:panelGrid id="pnlChoferes" columns="1" styleClass="cmStyle" >
+									<p:dataTable id="dtChoferes" paginator="false"  value="#{masterSupView.choferes}"
+											var="chof" reflow="true" rowSelectMode="checkbox" resizableColumns="true"
+											selection="#{masterSupView.choferesSel}" rowKey="#{chof.id}" style="margin-bottom:0">
+											<p:ajax event="rowSelectCheckbox" listener="#{masterSupView.activarCambio(3)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:ajax event="rowUnselectCheckbox" listener="#{masterSupView.activarCambio(3)}" update="form:btnGuardarOp, form:btnGuardarUnit, form:btnGuardarChof" />
+											<p:column selectionMode="multiple" style="text-align:center;" width="50"/>
+											<p:column headerText="Nombre" style="text-align:center;">
+												<h:outputText value="#{chof.nombre}" />
+											</p:column>
+											<p:column headerText="Paterno" style="text-align:center;">
+												<h:outputText value="#{chof.apaterno}" />
+											</p:column>
+										</p:dataTable>
+								</p:panelGrid>
+							</p:fragment>
+						</div>
+					</div>
+
+				</div>
+				
+			</div>
+			<!-- FIN DEL ROW PRINCIPAL -->
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

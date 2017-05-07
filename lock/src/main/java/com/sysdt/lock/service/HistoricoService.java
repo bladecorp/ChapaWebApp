@@ -32,26 +32,32 @@ public class HistoricoService {
 	@Autowired
 	private ChoferService choferService;
 	
-	public List<Historico> obtenerHistoricoPorUsuarioFechaYTipo(int idCliente, String username, Date fechaIni, Date fechaFin, int tipo) throws Exception{
+	public List<Historico> obtenerHistoricoPorUsuarioFechaYTipo(int idCliente, String username, Date fechaIni, Date fechaFin, int tipo, String eco) throws Exception{
 		HistoricoExample exHist = new HistoricoExample();
 		Criteria criteria = exHist.createCriteria();
-		criteria.andUsernameEqualTo(username);
-		criteria.andFechaBetween(generarFecha(fechaIni, FECHA_INICIO), generarFecha(fechaFin, FECHA_FIN));
-		if(tipo == Constantes.TipoEvento.GENERACION_CODIGO){
-			criteria.andLatitudIsNull().andLongitudIsNull();
-		}else if(tipo == Constantes.TipoEvento.APERTURA_CHAPA){
-			criteria.andLatitudIsNotNull().andLongitudIsNotNull();
+		if(username != null && !username.trim().isEmpty()){
+			criteria.andUsernameEqualTo(username);
 		}
-		return historicoConChofer(idCliente, historicoMapper.selectByExample(exHist));
+		criteria.andFechaBetween(generarFecha(fechaIni, FECHA_INICIO), generarFecha(fechaFin, FECHA_FIN)).andIdclienteEqualTo(idCliente);
+		if(tipo == Constantes.TipoEvento.GENERACION_CODIGO){
+			criteria.andLatitudIsNull().andLongitudIsNull().andIdtipoeventoEqualTo(tipo);
+		}else if(tipo == Constantes.TipoEvento.APERTURA_CHAPA){
+			criteria.andLatitudIsNotNull().andLongitudIsNotNull().andIdtipoeventoEqualTo(tipo);
+		}else if(tipo == 3){
+			criteria.andPlacasEcoEqualTo(eco);
+		}
+		return historicoMapper.selectByExample(exHist);
+	//	return historicoConChofer(idCliente, historicoMapper.selectByExample(exHist));
 	}
 	
-	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer) throws Exception{
+	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer, int idCliente) throws Exception{
 		Historico historico = new Historico();
 		historico.setFecha(Utilerias.fechaLocale(new Date()));
 		historico.setUsername(username);
 		historico.setPlacasEco(placasEco.toUpperCase());
 		historico.setEstado(estado);
 		historico.setIdchofer(idChofer);
+		historico.setIdcliente(idCliente);
 		historico.setIdtipoevento(Constantes.TipoEvento.GENERACION_CODIGO);
 		insertarHistorico(historico);
 	}
@@ -60,18 +66,18 @@ public class HistoricoService {
 		historicoMapper.insert(historico);
 	}
 	
-	private List<Historico> historicoConChofer(int idCliente, List<Historico> historicos){
+/*	private List<Historico> historicoConChofer(int idCliente, List<Historico> historicos){
 		Map<Integer, Chofer> choferes = choferService.obtenerChoferesPorIdClienteComoMapa(idCliente, false, false);
 		for (Historico historico : historicos) {
 			Chofer chofer = choferes.get(historico.getIdchofer());
 			if(chofer != null){
-				historico.setChofer(chofer.getNombre()+" "+chofer.getApaterno());
+				historico.setNomchofer(chofer.getNombre()+" "+chofer.getApaterno());
 			}else{
-				historico.setChofer("N/D");
+				historico.setNomchofer("N/D");
 			}
 		}
 		return historicos;
-	}
+	}  */
 	
 	private Date generarFecha(Date fecha, int tipoFecha){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));

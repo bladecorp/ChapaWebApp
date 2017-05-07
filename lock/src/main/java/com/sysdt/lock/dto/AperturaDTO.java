@@ -6,11 +6,14 @@ public class AperturaDTO implements Serializable{
 
 	private static final long serialVersionUID = 5474728287541454227L;
 	private String usuario;
+	private String nomUsuario;
+	private String nomChofer;
 	private String eco;
 	private String serie;
 	private long tiempo;
 	private String codigo;
 	private boolean isWialon;
+	private int idCliente;
 	
 	public String getUsuario() {
 		return usuario;
@@ -47,6 +50,24 @@ public class AperturaDTO implements Serializable{
 	}
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
+	}
+	public String getNomUsuario() {
+		return nomUsuario;
+	}
+	public void setNomUsuario(String nomUsuario) {
+		this.nomUsuario = nomUsuario;
+	}
+	public String getNomChofer() {
+		return nomChofer;
+	}
+	public void setNomChofer(String nomChofer) {
+		this.nomChofer = nomChofer;
+	}
+	public int getIdCliente() {
+		return idCliente;
+	}
+	public void setIdCliente(int idCliente) {
+		this.idCliente = idCliente;
 	}
 	
 	

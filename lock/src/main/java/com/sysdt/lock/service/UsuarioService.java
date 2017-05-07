@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sysdt.lock.dao.SupervisorEntidadMapper;
 import com.sysdt.lock.dao.UsuarioMapper;
 import com.sysdt.lock.dto.UsuarioDTO;
 import com.sysdt.lock.model.Cliente;
+import com.sysdt.lock.model.SupervisorEntidad;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.model.UsuarioExample;
 import com.sysdt.lock.model.UsuarioExample.Criteria;
@@ -28,9 +30,9 @@ public class UsuarioService {
 	@Autowired
 	private HistoricoService historicoService;
 	@Autowired
-	private DependenciaService dependenciaService;
-	@Autowired
 	private EmailService emailService;
+	@Autowired
+	private SupervisorEntidadService supervisorEntidadService;
 	
 	public void actualizarPassword(String username, String password, String nuevoPassword) throws Exception{
 		Usuario usuario = validarUsuario(username, password, nuevoPassword);
@@ -58,7 +60,7 @@ public class UsuarioService {
 		Usuario usuario = validarUsuario(username, password, null);
 		Cliente cliente = clienteService.obtenerClientePorId(usuario.getIdCliente());
 		if(!cliente.getNombre().contentEquals(nombreCliente.toUpperCase())){
-			throw new Exception("Usuario no coincide con url");
+			throw new Exception("No tiene los permisos necesarios. Revise su dirección de acceso");
 		}
 		if(cliente.getPeriodovalidacion() > 0 && Utilerias.excedeVigencia(usuario.getCaducidadpassword()) ){
 			throw new Exception("Debe actualizar su password para poder acceder al sistema");
@@ -82,10 +84,17 @@ public class UsuarioService {
 	
 	public void cambiarEstadoCuentasDeUsuario(int idCliente, boolean estado) throws Exception{
 		UsuarioExample exUser = new UsuarioExample();
-		exUser.createCriteria().andIdClienteEqualTo(idCliente);
+		exUser.createCriteria().andIdClienteEqualTo(idCliente)
+		.andIdTipousuarioNotEqualTo(Constantes.TipoUsuario.ADMINISTRADOR).andIdTipousuarioNotEqualTo(Constantes.TipoUsuario.MASTER);
 		Usuario user = new Usuario();
 		user.setEnabled(estado);
 		usuarioMapper.updateByExampleSelective(user, exUser);
+	}
+	
+	public List<Usuario> obtenerUsuariosPorTipoYidCliente(int idCliente, int idTipoUsuario){
+		UsuarioExample exUser = new UsuarioExample();
+		exUser.createCriteria().andIdClienteEqualTo(idCliente).andIdTipousuarioEqualTo(idTipoUsuario);
+		return usuarioMapper.selectByExample(exUser);
 	}
 	
 	public List<Usuario> obtenerUsuariosPorIdClienteSinPass(int idCliente){
@@ -96,44 +105,19 @@ public class UsuarioService {
 		return usuarios;
 	}
 	
-	public List<Usuario> obtenerOperadoresPorSupervisor(String username){
-		List<String> dependencias = dependenciaService.obtenerDependenciasPorUsuario(username, Constantes.TipoUsuario.SUPERVISOR);
-		dependencias.add(username);
-		UsuarioExample exUser = new UsuarioExample();
-		exUser.createCriteria().andUsernameIn(dependencias);
-		return usuarioMapper.selectByExample(exUser);
-	}
-	
-	public List<String> obtenerListaDependientesPorTipo(int idCliente, int idTipoUsuario){
-		List<String> dependientes = new ArrayList<String>();
-		UsuarioExample exUser = new UsuarioExample();
-		Criteria criteria = exUser.createCriteria();
-		criteria.andIdClienteEqualTo(idCliente);
-		if(idTipoUsuario == Constantes.TipoUsuario.SUPERVISOR){
-			criteria.andIdTipousuarioEqualTo(Constantes.TipoUsuario.OPERADOR);
-		}else if(idTipoUsuario == Constantes.TipoUsuario.OPERADOR){
-			criteria.andIdTipousuarioEqualTo(Constantes.TipoUsuario.SUPERVISOR);
-		}
-		List<Usuario> usuarios = usuarioMapper.selectByExample(exUser);
-		for (Usuario usuario : usuarios) {
-			dependientes.add(usuario.getUsername());
-		}
-		return dependientes;
-	}
-	
 	public String generarCodigo(String clave1, String clave2, String username, String placasEco, int idCliente, int idChofer)throws Exception {
 		String codigo = "";
 		try {
 			Security security = new Security();
 			codigo = security.convertirLlaves(clave1, clave2, idCliente);
 			if(codigo != null){
-				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, true, idChofer);
+				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, true, idChofer, idCliente);
 			}else{
-				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
+				historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer, idCliente);
 				codigo = "Generar nuevo codigo";
 			}
 		} catch (Exception e) {
-			historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer);
+			historicoService.insertarHistoricoDeGeneracionCodigos(username, placasEco, false, idChofer, idCliente);
 			throw new Exception("Error al convertir claves");
 		}
 		
@@ -148,6 +132,24 @@ public class UsuarioService {
 		}
 	}
 	
+	public int obtenerNumeroCuentasPorTipo(int idCliente, int idTipoUsuario){
+		UsuarioExample exUser = new UsuarioExample();
+		exUser.createCriteria().andIdTipousuarioEqualTo(idTipoUsuario).andIdClienteEqualTo(idCliente);
+		return usuarioMapper.countByExample(exUser);
+	}
+	
+	public List<Usuario> obtenerUsuariosPorIdClienteSinAdmin(int idCliente){
+		UsuarioExample exUser = new UsuarioExample();
+		exUser.createCriteria().andIdClienteEqualTo(idCliente).andIdTipousuarioNotEqualTo(Constantes.TipoUsuario.ADMINISTRADOR)
+		.andIdTipousuarioNotEqualTo(Constantes.TipoUsuario.MASTER);
+		return usuarioMapper.selectByExample(exUser);
+	}
+	
+	public void eliminarUsuarioCompletoPorUsernameYidCliente(String username, int idCliente)throws Exception{
+		emailService.eliminarEmailsPorUsername(username);
+		supervisorEntidadService.eliminarRelacionesPorUsername(username);
+		eliminarUsuarioPorIdYidCliente(username, idCliente);
+	}
 	
 	//********* METODOS SIMPLES ******///
 	
@@ -157,10 +159,17 @@ public class UsuarioService {
 	}
 	
 	private void actualizarUsuario(Usuario usuario) throws Exception{
+		usuarioTrim(usuario);
 		usuarioMapper.updateByPrimaryKey(usuario);
 	}
 	
-	public void eliminarUsuarioPorId(String username) throws Exception{
+	private void eliminarUsuarioPorIdYidCliente(String username, int idCliente) throws Exception{
+		UsuarioExample exUSER = new UsuarioExample();
+		exUSER.createCriteria().andUsernameEqualTo(username).andIdClienteEqualTo(idCliente);
+		usuarioMapper.deleteByExample(exUSER);
+	}
+	
+	private void eliminarUsuarioPorId(String username) throws Exception{
 		usuarioMapper.deleteByPrimaryKey(username);
 	}
 	
@@ -182,14 +191,46 @@ public class UsuarioService {
 		usuarioDTO.setIdTipousuario(usuario.getIdTipousuario());
 		usuarioDTO.setUsername(usuario.getUsername());
 		usuarioDTO.setCliente(cliente);
+		usuarioDTO.setNombre(usuario.getNombre());
+		usuarioDTO.setApaterno(usuario.getApaterno());
+		usuarioDTO.setAmaterno(usuario.getAmaterno());
 		return usuarioDTO;
 	}
 	
 	private void usuarioTrim(Usuario usuario){
 		usuario.setUsername(usuario.getUsername().trim().toLowerCase());
 		usuario.setPassword(usuario.getPassword().trim().toLowerCase());
+		usuario.setNombre(usuario.getNombre().trim().toUpperCase());
+		usuario.setApaterno(usuario.getApaterno().trim().toUpperCase());
+		usuario.setAmaterno(usuario.getAmaterno() != null ? usuario.getAmaterno().trim().toUpperCase() : "");
+	}
+
+	public List<Usuario> obtenerOperadoresPorSupervisor(String usernameSup, int idCliente) {
+		List<Usuario> usuarios = obtenerUsuariosPorTipoYidCliente(idCliente, Constantes.TipoUsuario.OPERADOR);
+		List<SupervisorEntidad> relaciones = supervisorEntidadService.obtenerRelacionSupervisorEntidad(usernameSup, Constantes.TipoUsuario.OPERADOR);
+		List<Usuario> operadores = new ArrayList<Usuario>();
+		for(SupervisorEntidad relacion : relaciones){
+			for(Usuario usuario : usuarios){
+				if(usuario.getUsername().contentEquals(relacion.getIdentidad())){
+					operadores.add(usuario);
+					break;
+				}
+			}
+		}
+		return operadores;
 	}
 	
-	
+	public List<Usuario> relacionarOperadores(List<Usuario> operadores, List<SupervisorEntidad> entidades){
+		List<Usuario> operadoresRel = new ArrayList<Usuario>();
+		for(SupervisorEntidad entidad : entidades){
+			for(Usuario operador : operadores){
+				if(operador.getUsername().contentEquals(entidad.getIdentidad())){
+					operadoresRel.add(operador);
+					break;
+				}
+			}
+		}
+		return operadoresRel;
+	}
 	
 }
