@@ -50,13 +50,15 @@ public class HistoricoService {
 	//	return historicoConChofer(idCliente, historicoMapper.selectByExample(exHist));
 	}
 	
-	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer, int idCliente) throws Exception{
+	public void insertarHistoricoDeGeneracionCodigos(String username, String placasEco, boolean estado, int idChofer, int idCliente, String nomUsuario, String nomChofer) throws Exception{
 		Historico historico = new Historico();
 		historico.setFecha(Utilerias.fechaLocale(new Date()));
 		historico.setUsername(username);
+		historico.setNomusuario(nomUsuario);
 		historico.setPlacasEco(placasEco.toUpperCase());
 		historico.setEstado(estado);
 		historico.setIdchofer(idChofer);
+		historico.setNomchofer(nomChofer);
 		historico.setIdcliente(idCliente);
 		historico.setIdtipoevento(Constantes.TipoEvento.GENERACION_CODIGO);
 		insertarHistorico(historico);

@@ -23,6 +23,12 @@ public class ChoferService {
 	@Autowired
 	private ChoferMapper choferMapper;
 	
+	public int obtenerCountChoferesPorIdCliente(int idCliente){
+		ChoferExample exChof = new ChoferExample();
+		exChof.createCriteria().andIdclienteEqualTo(idCliente);
+		return choferMapper.countByExample(exChof);
+	}
+	
 	public List<Chofer> obtenerChoferesPorIdCliente(int idCliente, boolean buscarPorEstado, boolean estado, String orderBy){
 		ChoferExample exChofer = new ChoferExample();
 		Criteria criteria = exChofer.createCriteria();
@@ -65,6 +71,10 @@ public class ChoferService {
 		chofer.setId(idChofer);
 		chofer.setToken(token);
 		return choferMapper.updateByPrimaryKeySelective(chofer) == 1;
+	}
+	
+	public void eliminarChoferPorId(int idChofer){
+		choferMapper.deleteByPrimaryKey(idChofer);
 	}
 	
 	public boolean habilitar(int idChofer) throws Exception{

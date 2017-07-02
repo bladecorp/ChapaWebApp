@@ -9,6 +9,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
 
 import org.springframework.beans.BeanUtils;
 
@@ -19,6 +20,7 @@ import com.sysdt.lock.model.TipoUsuario;
 import com.sysdt.lock.model.Unidad;
 import com.sysdt.lock.model.Usuario;
 import com.sysdt.lock.service.CatalogoService;
+import com.sysdt.lock.service.ChoferService;
 import com.sysdt.lock.service.ClienteService;
 import com.sysdt.lock.service.EmailService;
 import com.sysdt.lock.service.UnidadService;
@@ -43,6 +45,8 @@ public class AdminView implements Serializable {
 	private UnidadService unidadService;
 	@ManagedProperty("#{emailService}")
 	private EmailService emailService;
+	@ManagedProperty("#{choferService}")
+	private ChoferService choferService;
 //	@ManagedProperty("#{userDTO}")
 //	private UserDTO userDTO;
 	
@@ -179,12 +183,13 @@ public class AdminView implements Serializable {
 	}
 	
 	public void cambioClienteAct(){
-		for(Cliente cl : clientes){
+		clienteAct = clienteService.obtenerClientePorId(idClienteTemp);
+	/*	for(Cliente cl : clientes){
 			if(idClienteTemp == cl.getId()){
 				BeanUtils.copyProperties(cl, clienteAct);
 				break;
 			}
-		}
+		}*/
 	}
 	
 	public boolean validarUsuario(){
@@ -219,6 +224,10 @@ public class AdminView implements Serializable {
 			MensajeGrowl.mostrar("El email es inválido", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
+		if(!verificarAumentoCuentas(usuario.getIdCliente(), usuario.getIdTipousuario())){
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -235,16 +244,16 @@ public class AdminView implements Serializable {
 			MensajeGrowl.mostrar("Debe indicar el password", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
-		if(usuario.getNombre().trim().isEmpty()){
+		if(usuarioSel.getNombre().trim().isEmpty()){
 			MensajeGrowl.mostrar("Debe indicar el nombre", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
-		if(usuario.getApaterno().trim().isEmpty()){
+		if(usuarioSel.getApaterno().trim().isEmpty()){
 			MensajeGrowl.mostrar("Debe indicar el apellido paterno", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
-		if(usuario.getAmaterno().trim().isEmpty()){
-			usuario.setAmaterno("");
+		if(usuarioSel.getAmaterno().trim().isEmpty()){
+			usuarioSel.setAmaterno("");
 		}
 		if(!emailSel.trim().isEmpty() && !Constantes.EMAIL_VALIDATOR.matcher(emailSel.trim()).matches()){
 			MensajeGrowl.mostrar("El email es inválido", FacesMessage.SEVERITY_ERROR);
@@ -289,17 +298,46 @@ public class AdminView implements Serializable {
 	
 	public void restarCantidad(int tipoMax){
 		if(tipoMax == Constantes.TipoMax.MAX_OPERADORES){
-			if(clienteAct.getMaxoperadores() > 0)
+			if(clienteAct.getMaxoperadores() > 0) {
+				int cuentas = usuarioService.obtenerNumeroCuentasPorTipo(clienteAct.getId(), Constantes.TipoUsuario.OPERADOR);
+				if(clienteAct.getMaxoperadores() <= cuentas){
+					int res = (cuentas - clienteAct.getMaxoperadores())+1;
+					MensajeGrowl.mostrar("Para restar, primero debe eliminar "+res+" cuenta(s) de operador", FacesMessage.SEVERITY_ERROR);
+					return;
+				}
 				clienteAct.setMaxoperadores(clienteAct.getMaxoperadores() - 1);
+			}
 		}else if(tipoMax == Constantes.TipoMax.MAX_SUPERVISORES){
-			if(clienteAct.getMaxsupervisores() > 0)
+			if(clienteAct.getMaxsupervisores() > 0){
+				int cuentas = usuarioService.obtenerNumeroCuentasPorTipo(clienteAct.getId(), Constantes.TipoUsuario.SUPERVISOR);
+				if(clienteAct.getMaxsupervisores() <= cuentas){
+					int res = (cuentas - clienteAct.getMaxsupervisores())+1;
+					MensajeGrowl.mostrar("Para restar, primero debe eliminar "+res+" cuenta(s) de supervisor", FacesMessage.SEVERITY_ERROR);
+					return;
+				}
 				clienteAct.setMaxsupervisores(clienteAct.getMaxsupervisores() - 1);
+			}
 		}else if(tipoMax == Constantes.TipoMax.MAX_CHOFERES){
-			if(clienteAct.getMaxchoferes() > 0)
+			if(clienteAct.getMaxchoferes() > 0) {
+				int cuentas = choferService.obtenerCountChoferesPorIdCliente(clienteAct.getId());
+				if(clienteAct.getMaxchoferes() <= cuentas){
+					int res = (cuentas - clienteAct.getMaxchoferes())+1;
+					MensajeGrowl.mostrar("Para restar, primero debe eliminar "+res+" chofer(es)", FacesMessage.SEVERITY_ERROR);
+					return;
+				}
 				clienteAct.setMaxchoferes(clienteAct.getMaxchoferes() - 1);
+			}
+				
 		}else if(tipoMax == Constantes.TipoMax.MAX_UNIDADES){
-			if(clienteAct.getMaxunidades() > 0)
+			if(clienteAct.getMaxunidades() > 0){
+				int cuentas = unidadService.obtenerCountUnidadesPorIdCliente(clienteAct.getId());
+				if(clienteAct.getMaxunidades() <= cuentas){
+					int res = (cuentas - clienteAct.getMaxunidades())+1;
+					MensajeGrowl.mostrar("Para restar, primero debe eliminar "+res+" unidad(es)", FacesMessage.SEVERITY_ERROR);
+					return;
+				}
 				clienteAct.setMaxunidades(clienteAct.getMaxunidades() - 1);
+			}
 		}
 	}
 	
@@ -310,6 +348,44 @@ public class AdminView implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	private void verificarReduccionCuentas(int idCliente, int idTipoCuenta){
+		Cliente cliente = clienteService.obtenerClientePorId(idCliente);
+		if(idTipoCuenta == Constantes.TipoEntidad.OPERADOR){
+			
+		}
+	}
+	
+	/**
+	 * Metodo que se utiliza para verificar la disponibilidad de cuentas de una entidad(supervisor, operador, chofer, unidad)
+	 * @return
+	 */
+	private boolean verificarDisponibilidadCuentas(){
+		return false;
+	}
+	
+	/**
+	 * Metodo que se utiliza cuando se quiere guardar una cuenta nueva de operador o supervisor.
+	 * @return
+	 */
+	private boolean verificarAumentoCuentas(int idCliente, int idTipoUsuario){
+		Cliente cliente = clienteService.obtenerClientePorId(idCliente);
+		int cuentas = usuarioService.obtenerNumeroCuentasPorTipo(idCliente, idTipoUsuario);
+		if(idTipoUsuario == Constantes.TipoUsuario.SUPERVISOR){
+			if(cuentas >= cliente.getMaxsupervisores()){
+				MensajeGrowl.mostrar("El cliente ya tiene el máximo de cuentas de supervisor autorizadas", FacesMessage.SEVERITY_ERROR);
+				return false;
+			}
+		} else if(idTipoUsuario == Constantes.TipoUsuario.OPERADOR){
+			if(cuentas >= cliente.getMaxoperadores()){
+				MensajeGrowl.mostrar("El cliente ya tiene el máximo de cuentas de operador autorizadas", FacesMessage.SEVERITY_ERROR);
+				return false;
+			}
+		} else{
+			return false;
+		}
+		return true;
 	}
 	
 	public ManejoSesionView getManejoSesionView() {
@@ -447,6 +523,14 @@ public class AdminView implements Serializable {
 
 	public void setClienteAct(Cliente clienteAct) {
 		this.clienteAct = clienteAct;
+	}
+
+	public ChoferService getChoferService() {
+		return choferService;
+	}
+
+	public void setChoferService(ChoferService choferService) {
+		this.choferService = choferService;
 	}
 	
 

@@ -22,6 +22,12 @@ public class UnidadService {
 	@Autowired
 	private SupervisorEntidadService supervisorEntidadService;
 	
+	public int obtenerUnidadesActivasPorIdCliente(int idCliente){
+		UnidadExample exUnit = new UnidadExample();
+		exUnit.createCriteria().andIdclienteEqualTo(idCliente);
+		return unidadMapper.countByExample(exUnit);
+	}
+	
 	public int obtenerCountUnidadesPorIdCliente(int idCliente){
 		UnidadExample exUnit = new UnidadExample();
 		exUnit.createCriteria().andIdclienteEqualTo(idCliente);

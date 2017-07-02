@@ -147,7 +147,9 @@ public class UserView implements Serializable{
 		}
 		if(validarClaves()){
 			try {
-				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente(), chofer.getId());
+				String nomUsuario = usuarioDTO.getNombre()+" "+usuarioDTO.getApaterno()+" "+(usuarioDTO.getAmaterno()!=null?usuarioDTO.getAmaterno():"");
+				String nomChofer = chofer.getNombre()+" "+chofer.getApaterno()+" "+chofer.getAmaterno();
+				codigo = usuarioService.generarCodigo(clave1, clave2, usuarioDTO.getUsername(), unidad.getEco() , usuarioDTO.getIdCliente(), chofer.getId(), nomUsuario, nomChofer);
 				RequestContext.getCurrentInstance().execute("PF('dlg').show();");
 			} catch (Exception e) {
 				MensajeGrowl.mostrar("Ocurrió un error al generar el código: "+e.getMessage(), FacesMessage.SEVERITY_FATAL);

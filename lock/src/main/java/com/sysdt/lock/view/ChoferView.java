@@ -86,17 +86,20 @@ public class ChoferView implements Serializable{
 		}
 	}
 	
+	public void eliminarChofer(){
+		if(choferSel == null || choferSel.getId() == null){
+			MensajeGrowl.mostrar("Debe seleccionar un chofer", FacesMessage.SEVERITY_ERROR);
+			return;
+		}
+		choferService.eliminarChoferPorId(choferSel.getId());
+		chofer = new Chofer();
+		choferSel = new Chofer();
+		recargarTabla();
+		MensajeGrowl.mostrar("El chofer fue eliminado exitosamente", FacesMessage.SEVERITY_INFO);
+	}
+	
 	public void recargarTabla(){
-		if(estado == Constantes.EstadoChofer.TODOS){
-			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(),false, false, Constantes.OrderBy.CHOFER_NOMBRE);
-		}else{
-			boolean nuevoEstado = estado == 1;
-			choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(), true, nuevoEstado, Constantes.OrderBy.CHOFER_NOMBRE);
-		}
-		if(chofer != null){
-			chofer.setId(0);
-			limpiarCampos();
-		}
+		choferes = choferService.obtenerChoferesPorIdCliente(userDTO.getIdCliente(),false, false, Constantes.OrderBy.CHOFER_NOMBRE);
 	}
 	
 	private boolean validar(boolean isEditar){
@@ -121,11 +124,6 @@ public class ChoferView implements Serializable{
 		return true;
 	}
 	
-	public void limpiarCampos(){
-		chofer.setNombre("");
-		chofer.setApaterno("");
-		chofer.setAmaterno("");
-	}
 	
 	public void copiarChofer(){
 		chofer.setId(choferSel.getId());

@@ -36,7 +36,7 @@ public class ManejoSesionView implements Serializable {
 	@PostConstruct
 	public void init() {
 		obtenerUsuario();
-		if(usuarioDTO == null || usuarioDTO.getUsername() == null || usuarioDTO.getUsername().trim().isEmpty()){
+//		if(usuarioDTO == null || usuarioDTO.getUsername() == null || usuarioDTO.getUsername().trim().isEmpty()){
 	/*		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 			try {
 				ec.redirect("login.xhtml?"+nombreCliente);
@@ -52,7 +52,7 @@ public class ManejoSesionView implements Serializable {
 				crearCookieRepeticion(0);
 			}  */
 			
-		}
+//		}
 	}
 
 	public UsuarioDTO obtenerUsuarioEnSesion() {
