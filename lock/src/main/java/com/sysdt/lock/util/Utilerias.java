@@ -5,12 +5,18 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 public class Utilerias {
 
 	public static Date fechaLocale(Date date){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"),new Locale("es_MX"));
-		cal.setTime(date);
-		return cal.getTime();
+		DateTime dt = new DateTime(date);
+	//	DateTimeZone dtZone = DateTimeZone.forID("America/New_York");
+		DateTimeZone dtZone = DateTimeZone.forID("America/Mexico_City");
+		DateTime dtus = dt.withZone(dtZone); System.out.println("Fecha Locale: "+dtus.toLocalDateTime().toDate());
+		return dtus.toLocalDateTime().toDate();
 	}
 	
 	public static Date fechaHoyLocaleEnCeros(){
