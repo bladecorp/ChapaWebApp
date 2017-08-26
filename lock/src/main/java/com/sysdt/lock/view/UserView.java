@@ -90,6 +90,7 @@ public class UserView implements Serializable{
 				choferes.add(generarChoferVacio());
 			}
 			//if(usuarioDTO.getIdTipousuario() == 1){tipoServicio=1;}else{tipoServicio=2;}
+			tipoServicio = 1;// para que se pinte el formulario con unidades y choferes
 		}else{
 			manejoSesionView.cerrarSesionUsuario();
 		}
