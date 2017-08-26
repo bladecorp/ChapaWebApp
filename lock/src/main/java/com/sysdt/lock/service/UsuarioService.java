@@ -34,9 +34,12 @@ public class UsuarioService {
 	@Autowired
 	private SupervisorEntidadService supervisorEntidadService;
 	
-	public void actualizarPassword(String username, String password, String nuevoPassword) throws Exception{
+	public void actualizarPassword(String username, String password, String nuevoPassword, String nombreCliente) throws Exception{
 		Usuario usuario = validarUsuario(username, password, nuevoPassword);
 		Cliente cliente = clienteService.obtenerClientePorId(usuario.getIdCliente());
+		if(!cliente.getNombre().contentEquals(nombreCliente.toUpperCase())){
+			throw new Exception("No fue posible actualizar el password. Revise su dirección de acceso o consulte a su proveedor");
+		}
 		usuario.setPassword(nuevoPassword);
 		usuario.setCaducidadpassword(Utilerias.fechaSumarDias(cliente.getPeriodovalidacion()));
 		actualizarUsuario(usuario);
@@ -60,7 +63,7 @@ public class UsuarioService {
 		Usuario usuario = validarUsuario(username, password, null);
 		Cliente cliente = clienteService.obtenerClientePorId(usuario.getIdCliente());
 		if(!cliente.getNombre().contentEquals(nombreCliente.toUpperCase())){
-			throw new Exception("No tiene los permisos necesarios. Revise su dirección de acceso");
+			throw new Exception("No tiene los permisos necesarios. Revise su dirección de acceso o consulte a su proveedor");
 		}
 		if(cliente.getPeriodovalidacion() > 0 && Utilerias.excedeVigencia(usuario.getCaducidadpassword()) ){
 			throw new Exception("Debe actualizar su password para poder acceder al sistema");

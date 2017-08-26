@@ -87,7 +87,8 @@ public class LoginView implements Serializable{
 	public void actualizarPassword(){
 		if(validarDatosActualizacion()){
 			try {
-				usuarioService.actualizarPassword(username, password, passNuevo.trim());
+				String clientName = nombreCliente!=null?nombreCliente.trim():"SYSDT";
+				usuarioService.actualizarPassword(username, password, passNuevo.trim(), clientName);
 				MensajeGrowl.mostrar("Password actualizado exitosamente", FacesMessage.SEVERITY_INFO);
 				editar = false;
 			} catch (Exception e) {
