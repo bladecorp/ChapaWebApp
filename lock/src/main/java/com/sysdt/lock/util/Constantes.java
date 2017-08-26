@@ -50,6 +50,7 @@ public class Constantes {
 		public static final int MAX_SUPERVISORES = 2;
 		public static final int MAX_CHOFERES = 3;
 		public static final int MAX_UNIDADES = 4;
+		public static final int MAX_MASTERS = 5;
 	}
 	
 	public class TipoEntidad{

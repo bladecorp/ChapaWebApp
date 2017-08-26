@@ -293,6 +293,8 @@ public class AdminView implements Serializable {
 			clienteAct.setMaxchoferes(clienteAct.getMaxchoferes() + 1);
 		}else if(tipoMax == Constantes.TipoMax.MAX_UNIDADES){
 			clienteAct.setMaxunidades(clienteAct.getMaxunidades() + 1);
+		}else if(tipoMax == Constantes.TipoMax.MAX_MASTERS){
+			clienteAct.setMaxmasters(clienteAct.getMaxmasters() + 1);
 		}
 	}
 	
@@ -338,6 +340,16 @@ public class AdminView implements Serializable {
 				}
 				clienteAct.setMaxunidades(clienteAct.getMaxunidades() - 1);
 			}
+		}else if(tipoMax == Constantes.TipoMax.MAX_MASTERS){
+			if(clienteAct.getMaxmasters() > 0){
+				int cuentas = usuarioService.obtenerNumeroCuentasPorTipo(clienteAct.getId(), Constantes.TipoUsuario.MASTER);
+				if(clienteAct.getMaxmasters() <= cuentas){
+					int res = (cuentas - clienteAct.getMaxmasters())+1;
+					MensajeGrowl.mostrar("Para restar, primero debe eliminar "+res+" cuenta(s) master", FacesMessage.SEVERITY_ERROR);
+					return;
+				}
+				clienteAct.setMaxmasters(clienteAct.getMaxmasters() - 1);
+			}
 		}
 	}
 	
@@ -382,7 +394,13 @@ public class AdminView implements Serializable {
 				MensajeGrowl.mostrar("El cliente ya tiene el máximo de cuentas de operador autorizadas", FacesMessage.SEVERITY_ERROR);
 				return false;
 			}
+		} else if(idTipoUsuario == Constantes.TipoUsuario.MASTER){
+			if(cuentas >= cliente.getMaxmasters()){
+				MensajeGrowl.mostrar("El cliente ya tiene el máximo de cuentas master autorizadas", FacesMessage.SEVERITY_ERROR);
+				return false;
+			}
 		} else{
+			MensajeGrowl.mostrar("Tipo de usuario no reconocido", FacesMessage.SEVERITY_ERROR);
 			return false;
 		}
 		return true;
