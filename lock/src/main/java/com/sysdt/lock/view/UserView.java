@@ -89,7 +89,7 @@ public class UserView implements Serializable{
 			if(choferes.isEmpty()){
 				choferes.add(generarChoferVacio());
 			}
-			if(usuarioDTO.getIdTipousuario() == 1){tipoServicio=1;}else{tipoServicio=2;}
+			//if(usuarioDTO.getIdTipousuario() == 1){tipoServicio=1;}else{tipoServicio=2;}
 		}else{
 			manejoSesionView.cerrarSesionUsuario();
 		}
