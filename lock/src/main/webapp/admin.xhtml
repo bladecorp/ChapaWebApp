@@ -164,7 +164,7 @@
 													value="#{adminView.idClienteTemp}">
 													<p:ajax event="change" 
 														listener="#{adminView.cambioClienteAct}" 
-														update="inputClienteNombre, inputClienteImagen, slctWialon, maxUnidades, maxChoferes, maxOperadores, maxSupervisores, inputVigencia" 
+														update="inputClienteNombre, inputClienteImagen, slctWialon, maxMasters, maxUnidades, maxChoferes, maxOperadores, maxSupervisores, inputVigencia" 
 														onstart="PF('statusDialog').show()"  oncomplete="PF('statusDialog').hide()"/>
 													<f:selectItems value="#{adminView.clientes}" var="cliente"
 														itemLabel="#{cliente.nombre} - #{cliente.id-1}" itemValue="#{cliente.id}" />

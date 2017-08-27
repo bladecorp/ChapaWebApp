@@ -111,13 +111,13 @@ public class AdminView implements Serializable {
 	public void guardarCliente(){
 		if(validarClienteAct()){
 			try {
-				clienteAct.setId(0);
+				generarClienteNuevo();
 				clienteService.insertarCliente(clienteAct);
 				clientes = clienteService.obtenerClientes();
 //				cliente = new Cliente();
 				MensajeGrowl.mostrar("El cliente se guardó exitosamente", FacesMessage.SEVERITY_INFO);;
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Error al guardar cliente", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar(e.getMessage(), FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class AdminView implements Serializable {
 			//	BeanUtils.copyProperties(clientes.get(0),clienteAct);
 				MensajeGrowl.mostrar("El cliente se actualizó exitosamente", FacesMessage.SEVERITY_INFO);;
 			} catch (Exception e) {
-				MensajeGrowl.mostrar("Error al actualizar cliente", FacesMessage.SEVERITY_FATAL);
+				MensajeGrowl.mostrar(e.getMessage(), FacesMessage.SEVERITY_FATAL);
 			}
 		}
 	}
@@ -404,6 +404,15 @@ public class AdminView implements Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+	private void generarClienteNuevo(){
+		clienteAct.setId(0);
+		clienteAct.setMaxchoferes(0);
+		clienteAct.setMaxunidades(0);
+		clienteAct.setMaxoperadores(0);
+		clienteAct.setMaxsupervisores(0);
+		clienteAct.setMaxmasters(0);
 	}
 	
 	public ManejoSesionView getManejoSesionView() {

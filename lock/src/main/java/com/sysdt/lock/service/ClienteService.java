@@ -47,14 +47,27 @@ public class ClienteService {
 	
 	public void insertarCliente(Cliente cliente)throws Exception{
 		clienteTrim(cliente);
+		buscarNombreCliente(cliente.getNombre());
 		cliente.setAlto("140");
 		cliente.setAncho(320);
+		cliente.setMaxchoferes(0);
+		cliente.setMaxunidades(0);
+		cliente.setMaxoperadores(0);
+		cliente.setMaxsupervisores(0);
+		cliente.setMaxmasters(0);
 		clienteMapper.insert(cliente);
 	}
 	
 	public void actualizarCliente(Cliente cliente)throws Exception{
 		clienteTrim(cliente);
+		buscarNombreCliente(cliente.getNombre());
 		clienteMapper.updateByPrimaryKey(cliente);
+	}
+	
+	private void buscarNombreCliente(String nombreCliente) throws Exception{
+		if(obtenerClientePorNombre(nombreCliente)!= null){
+			throw new Exception("El nombre del cliente ya existe");
+		}
 	}
 	
 	private void clienteTrim(Cliente cliente){
